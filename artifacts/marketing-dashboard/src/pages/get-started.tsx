@@ -2,121 +2,86 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
-  Settings2,
-  Users,
-  GitBranch,
-  Megaphone,
-  CheckCircle2,
-  Circle,
-  ChevronDown,
-  ChevronUp,
-  Mail,
-  MessageSquare,
-  Share2,
-  MoreHorizontal,
-  Sparkles,
-  ArrowRight,
-  X,
+  Settings2, Users, GitBranch, Megaphone,
+  CheckCircle2, Circle, ChevronDown, ChevronUp,
+  Mail, MessageSquare, Sparkles, ArrowRight, X,
+  Zap, ShieldCheck, BarChart2, Package,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useLocation } from 'wouter';
 
-// ─── shared primitives ────────────────────────────────────────────
-
-function SectionCard({
-  icon: Icon,
-  title,
-  description,
-  badge,
-  children,
-}: {
-  icon: React.ElementType;
-  title: string;
-  description: string;
-  badge: string;
-  children: React.ReactNode;
-}) {
+// ─── Progress ─────────────────────────────────────────────────
+function ProgressRing({ value, max }: { value: number; max: number }) {
+  const pct = value / max;
+  const r = 16, c = 2 * Math.PI * r;
   return (
-    <div className="flex flex-col sm:flex-row rounded-xl border border-gray-200 bg-white overflow-hidden">
-      {/* left description panel */}
-      <div className="sm:w-56 shrink-0 p-5 sm:border-r border-b sm:border-b-0 border-gray-100">
-        <div className="flex items-center gap-2 mb-1.5">
-          <Icon className="h-4 w-4 text-foreground" />
-          <span className="text-sm font-semibold text-foreground">{title}</span>
-        </div>
-        <p className="text-xs text-muted-foreground leading-relaxed mb-3">{description}</p>
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[11px] font-medium">
-          {badge}
-        </span>
-      </div>
+    <svg width="40" height="40" viewBox="0 0 40 40">
+      <circle cx="20" cy="20" r={r} fill="none" stroke="hsl(var(--secondary))" strokeWidth="3" />
+      <circle cx="20" cy="20" r={r} fill="none" stroke="hsl(var(--foreground))" strokeWidth="3"
+        strokeDasharray={`${pct * c} ${c}`} strokeLinecap="round"
+        transform="rotate(-90 20 20)" className="transition-all duration-500" />
+      <text x="20" y="24" textAnchor="middle" fontSize="10" fontWeight="700" fill="hsl(var(--foreground))">{value}/{max}</text>
+    </svg>
+  );
+}
 
-      {/* right task panel */}
-      <div className="flex-1 min-w-0">{children}</div>
+// ─── Section card ─────────────────────────────────────────────
+function SectionCard({ icon: Icon, title, description, completed, total, children }: {
+  icon: React.ElementType; title: string; description: string; completed: number; total: number; children: React.ReactNode;
+}) {
+  const done = completed === total;
+  return (
+    <div className={cn('rounded-xl border overflow-hidden transition-all', done ? 'border-emerald-200 dark:border-emerald-900' : 'border-border')}>
+      <div className={cn('flex flex-col sm:flex-row', done ? 'bg-emerald-50/30 dark:bg-emerald-950/10' : 'bg-card')}>
+        <div className="sm:w-60 shrink-0 p-5 sm:border-r border-b sm:border-b-0 border-border/60 flex flex-col gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center', done ? 'bg-emerald-100 dark:bg-emerald-900' : 'bg-secondary')}>
+              <Icon className={cn('w-4 h-4', done ? 'text-emerald-600 dark:text-emerald-400' : 'text-foreground')} />
+            </div>
+            <span className="text-sm font-semibold">{title}</span>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">{description}</p>
+          <div className="flex items-center gap-2 mt-auto pt-1">
+            <div className="flex-1 h-1.5 bg-secondary rounded-full overflow-hidden">
+              <div className={cn('h-full rounded-full transition-all duration-500', done ? 'bg-emerald-500' : 'bg-foreground')}
+                style={{ width: `${(completed / total) * 100}%` }} />
+            </div>
+            <span className="text-[11px] font-medium text-muted-foreground shrink-0">{completed}/{total}</span>
+          </div>
+        </div>
+        <div className="flex-1 min-w-0">{children}</div>
+      </div>
     </div>
   );
 }
 
-function TaskRow({
-  done,
-  label,
-  rightSlot,
-  expanded,
-  onToggle,
-  expandedContent,
-}: {
-  done?: boolean;
-  label: string;
-  rightSlot?: React.ReactNode;
-  expanded?: boolean;
-  onToggle?: () => void;
-  expandedContent?: React.ReactNode;
+// ─── Task row ─────────────────────────────────────────────────
+function TaskRow({ done, label, rightSlot, expanded, onToggle, onCheck, expandedContent }: {
+  done?: boolean; label: string; rightSlot?: React.ReactNode;
+  expanded?: boolean; onToggle?: () => void; onCheck?: () => void; expandedContent?: React.ReactNode;
 }) {
   return (
-    <div className="border-b border-gray-100 last:border-0">
-      <div
-        className={cn(
-          'flex items-center gap-3 px-4 py-3',
-          onToggle && 'cursor-pointer',
-        )}
-        onClick={onToggle}
-      >
-        {/* status icon */}
-        <button
-          className="shrink-0"
-          onClick={(e) => { e.stopPropagation(); onToggle?.(); }}
-        >
-          {done ? (
-            <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-          ) : (
-            <Circle className="h-5 w-5 text-gray-300" strokeWidth={1.5} />
-          )}
+    <div className="border-b border-border/50 last:border-0">
+      <div className={cn('flex items-center gap-3 px-4 py-3', onToggle && 'cursor-pointer')} onClick={onToggle}>
+        <button className="shrink-0" onClick={e => { e.stopPropagation(); onCheck?.(); }}>
+          {done
+            ? <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+            : <Circle className="h-5 w-5 text-muted-foreground/40" strokeWidth={1.5} />}
         </button>
-
-        <span className={cn('text-sm flex-1 truncate', done ? 'text-muted-foreground line-through' : 'text-foreground font-medium')}>
-          {label}
-        </span>
-
+        <span className={cn('text-sm flex-1', done ? 'text-muted-foreground line-through' : 'font-medium')}>{label}</span>
         <div className="flex items-center gap-2 shrink-0">{rightSlot}</div>
-
         {onToggle && (
-          <button
-            className="ml-1 text-muted-foreground hover:text-foreground"
-            onClick={(e) => { e.stopPropagation(); onToggle(); }}
-          >
+          <span className="ml-1 text-muted-foreground">
             {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </button>
+          </span>
         )}
       </div>
-
       <AnimatePresence initial={false}>
         {expanded && expandedContent && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden bg-gray-50/70 border-t border-gray-100"
-          >
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}
+            className="overflow-hidden bg-secondary/20 border-t border-border/50">
             {expandedContent}
           </motion.div>
         )}
@@ -125,446 +90,219 @@ function TaskRow({
   );
 }
 
-function TableHeader({ cols }: { cols: string[] }) {
-  return (
-    <div className="grid border-b border-gray-100 bg-gray-50/60 px-4 py-2"
-      style={{ gridTemplateColumns: `2fr ${cols.slice(1).map(() => '1fr').join(' ')}` }}>
-      {cols.map((c) => (
-        <span key={c} className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
-          {c}
-        </span>
-      ))}
-    </div>
-  );
-}
-
-function TableRow({
-  cols,
-  expanded,
-  onToggle,
-  expandedContent,
-}: {
-  cols: React.ReactNode[];
-  expanded?: boolean;
-  onToggle?: () => void;
-  expandedContent?: React.ReactNode;
-}) {
-  const count = cols.length;
-  return (
-    <div className="border-b border-gray-100 last:border-0">
-      <div
-        className={cn('grid items-center px-4 py-3 gap-2', onToggle && 'cursor-pointer hover:bg-gray-50')}
-        style={{ gridTemplateColumns: `2fr ${Array(count - 1).fill('1fr').join(' ')}` }}
-        onClick={onToggle}
-      >
-        {cols.map((col, i) => (
-          <div key={i} className="min-w-0">
-            {col}
-          </div>
-        ))}
-      </div>
-      <AnimatePresence initial={false}>
-        {expanded && expandedContent && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden bg-gray-50 border-t border-gray-100"
-          >
-            {expandedContent}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-// ─── main page ────────────────────────────────────────────────────
-
+// ─── Main ─────────────────────────────────────────────────────
 export default function GetStarted() {
-  const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set(['marketing-channels']));
-  const [expandedTask, setExpandedTask] = useState<string | null>(null);
-  const [expandedRow, setExpandedRow] = useState<string | null>(null);
-  const [campaignBannerDismissed, setCampaignBannerDismissed] = useState(false);
+  const [, setLocation] = useLocation();
+  const [done, setDone] = useState<Set<string>>(new Set(['marketing-channels']));
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [dismissed, setDismissed] = useState(false);
 
-  const toggle = (key: string) =>
-    setExpandedTask((prev) => (prev === key ? null : key));
+  const toggle = (k: string) => setExpanded(p => p === k ? null : k);
+  const check = (k: string) => setDone(p => { const n = new Set(p); n.has(k) ? n.delete(k) : n.add(k); return n; });
+  const isDone = (k: string) => done.has(k);
 
-  const toggleRow = (key: string) =>
-    setExpandedRow((prev) => (prev === key ? null : key));
-
-  const toggleTask = (key: string) =>
-    setCompletedTasks((prev) => {
-      const next = new Set(prev);
-      next.has(key) ? next.delete(key) : next.add(key);
-      return next;
-    });
-
-  const guidesCompleted = (() => {
-    let n = 0;
-    if (completedTasks.has('business-tools') && completedTasks.has('marketing-channels') && completedTasks.has('branding')) n++;
-    if (completedTasks.has('signup-form') && completedTasks.has('signup-sms')) n++;
-    if (completedTasks.has('flow-email') && completedTasks.has('flow-sms')) n++;
-    if (!campaignBannerDismissed || completedTasks.has('campaign-done')) n++;
-    return n;
-  })();
+  const totalSteps = 7;
+  const completedSteps = done.size;
 
   return (
-    <div className="min-h-full bg-white">
-      <div className="max-w-[960px] mx-auto px-6 py-10">
+    <div className="min-h-full bg-background">
+      <div className="max-w-[880px] mx-auto px-4 sm:px-6 py-10 space-y-8">
 
-        {/* ── top progress bar ── */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-2 mx-auto">
-            <Circle className="h-5 w-5 text-gray-300" strokeWidth={1.5} />
-            <span className="text-sm text-muted-foreground font-medium">
-              {guidesCompleted} / 4 guides completed
-            </span>
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+          <div>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-2">Setup Guide</p>
+            <h1 className="text-2xl font-bold tracking-tight">Let's get you set up, John </h1>
+            <p className="text-sm text-muted-foreground mt-1.5 max-w-md">
+              Follow these steps to configure MarketFlow and start seeing results from your marketing.
+            </p>
           </div>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground absolute right-10">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </div>
+          <div className="flex items-center gap-4 shrink-0">
+            <ProgressRing value={completedSteps} max={totalSteps} />
+            <div>
+              <p className="text-sm font-semibold">{completedSteps} of {totalSteps} done</p>
+              <p className="text-xs text-muted-foreground">
+                {totalSteps - completedSteps > 0 ? `${totalSteps - completedSteps} remaining` : 'All complete!'}
+              </p>
+            </div>
+          </div>
+        </motion.div>
 
-        {/* ── heading ── */}
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold tracking-tight text-foreground mb-3">
-            Let's get started, John!
-          </h1>
-          <p className="text-sm text-muted-foreground max-w-lg mx-auto leading-relaxed">
-            Based on what we know about your business, we've created a personalized setup
-            guide to help you get started and start seeing value from MarketFlow.
-          </p>
-        </div>
+        {/* Quick wins strip */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
+          className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {[
+            { icon: Zap, label: 'Connect store', sub: 'Shopify, WooCommerce', done: isDone('business-tools') },
+            { icon: Users, label: 'Import contacts', sub: 'CSV or integration', done: false },
+            { icon: Mail, label: 'Send first email', sub: 'Use a template', done: isDone('marketing-channels') },
+            { icon: BarChart2, label: 'View analytics', sub: 'Track revenue', done: false },
+          ].map(({ icon: Icon, label, sub, done: d }) => (
+            <div key={label} className={cn('rounded-xl border p-3.5 flex items-center gap-3 cursor-pointer hover:shadow-sm transition-all',
+              d ? 'border-emerald-200 bg-emerald-50/30 dark:border-emerald-900 dark:bg-emerald-950/10' : 'border-border bg-card hover:border-foreground/20')}>
+              <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center shrink-0', d ? 'bg-emerald-100 dark:bg-emerald-900' : 'bg-secondary')}>
+                {d ? <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                   : <Icon className="w-4 h-4 text-foreground" />}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold truncate">{label}</p>
+                <p className="text-[10px] text-muted-foreground">{sub}</p>
+              </div>
+            </div>
+          ))}
+        </motion.div>
 
         <div className="space-y-4">
 
-          {/* ─────────────────────────────────────────────
-              Section 1 — Account setup
-          ───────────────────────────────────────────── */}
-          <SectionCard
-            icon={Settings2}
-            title="Account setup"
-            description="Get set up to start sending and grow your marketing."
-            badge="1 / 3 completed"
-          >
-            {/* Confirm business tools */}
-            <TaskRow
-              done={completedTasks.has('business-tools')}
-              label="Confirm business tools"
-              expanded={expandedTask === 'business-tools'}
-              onToggle={() => toggle('business-tools')}
-              rightSlot={
-                <>
-                  <div className="flex items-center gap-1 text-muted-foreground">
-                    <Share2 className="h-3.5 w-3.5" />
-                    <Share2 className="h-3.5 w-3.5 opacity-60" />
-                  </div>
-                  <Button
-                    size="sm"
-                    className="h-7 px-3 text-xs rounded-md bg-black text-white hover:bg-gray-800"
-                    onClick={(e) => { e.stopPropagation(); toggleTask('business-tools'); }}
-                  >
-                    Review
-                  </Button>
-                </>
-              }
-              expandedContent={
-                <div className="px-4 py-3 text-xs text-muted-foreground">
-                  Connect your ecommerce platform (Shopify, WooCommerce) and confirm
-                  the data MarketFlow should sync. This enables revenue attribution
-                  and personalised recommendations.
-                  <div className="mt-3 flex gap-2">
-                    <Button size="sm" className="h-7 text-xs bg-black text-white hover:bg-gray-800">Connect Shopify</Button>
-                    <Button size="sm" variant="outline" className="h-7 text-xs">Skip for now</Button>
-                  </div>
-                </div>
-              }
-            />
-
-            {/* Marketing channels — already completed */}
-            <TaskRow
-              done={completedTasks.has('marketing-channels')}
-              label="Marketing channels"
-              expanded={expandedTask === 'marketing-channels'}
-              onToggle={() => toggle('marketing-channels')}
-              rightSlot={
-                <>
-                  <div className="flex items-center gap-1 text-muted-foreground">
-                    <Mail className="h-3.5 w-3.5" />
-                    <MessageSquare className="h-3.5 w-3.5 opacity-70" />
-                    <Share2 className="h-3.5 w-3.5 opacity-50" />
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-7 px-3 text-xs font-medium"
-                    onClick={(e) => { e.stopPropagation(); }}
-                  >
-                    Manage
-                  </Button>
-                </>
-              }
-              expandedContent={
-                <div className="px-4 py-3 text-xs text-muted-foreground">
-                  Email is active. You can also enable SMS, push notifications and social channels.
-                </div>
-              }
-            />
-
-            {/* Confirm branding */}
-            <TaskRow
-              done={completedTasks.has('branding')}
-              label="Confirm branding"
-              expanded={expandedTask === 'branding'}
-              onToggle={() => toggle('branding')}
-              rightSlot={
-                <>
-                  <div className="flex items-center gap-1">
-                    <span className="w-4 h-4 rounded-sm bg-yellow-400 inline-block" />
-                    <span className="w-4 h-4 rounded-sm bg-black inline-block" />
-                    <span className="w-4 h-4 rounded-sm bg-gray-400 inline-block" />
-                    <span className="w-4 h-4 rounded-sm bg-blue-500 inline-block" />
-                  </div>
-                  <Button
-                    size="sm"
-                    className="h-7 px-3 text-xs rounded-md bg-black text-white hover:bg-gray-800"
-                    onClick={(e) => { e.stopPropagation(); toggleTask('branding'); }}
-                  >
-                    Review
-                  </Button>
-                </>
-              }
-              expandedContent={
-                <div className="px-4 py-3 text-xs text-muted-foreground">
-                  Set your brand colours, logo, and from-name so every email looks on-brand.
-                  <div className="mt-3 flex gap-2">
-                    <Button size="sm" className="h-7 text-xs bg-black text-white hover:bg-gray-800">Open brand settings</Button>
+          {/* ── Section 1: Account setup ── */}
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+            <SectionCard icon={Settings2} title="Account setup" description="Connect your store, confirm channels, and set your brand identity." completed={[isDone('business-tools'), isDone('marketing-channels'), isDone('branding')].filter(Boolean).length} total={3}>
+              <TaskRow done={isDone('marketing-channels')} label="Confirm marketing channels"
+                onToggle={() => toggle('channels')} expanded={expanded === 'channels'}
+                onCheck={() => check('marketing-channels')}
+                rightSlot={<div className="flex gap-1"><Mail className="w-3.5 h-3.5 text-muted-foreground" /><MessageSquare className="w-3.5 h-3.5 text-muted-foreground/50" /></div>}
+                expandedContent={<div className="p-4 text-xs text-muted-foreground space-y-3">
+                  <p>Email is active. Enable SMS to reach customers on their phones.</p>
+                  <div className="flex gap-2">
+                    <Button size="sm" className="h-7 text-xs" onClick={() => check('marketing-channels')}>Enable SMS</Button>
                     <Button size="sm" variant="outline" className="h-7 text-xs">Skip</Button>
                   </div>
-                </div>
-              }
-            />
-          </SectionCard>
-
-          {/* ─────────────────────────────────────────────
-              Section 2 — Grow your audience
-          ───────────────────────────────────────────── */}
-          <SectionCard
-            icon={Users}
-            title="Grow your audience"
-            description="Build your subscriber base by turning website visitors and social media users into subscribers."
-            badge="0 / 2 completed"
-          >
-            <TableHeader cols={['Form', 'Type', 'Status', 'Submitted']} />
-
-            {/* Sign-up Form row */}
-            <TableRow
-              expanded={expandedRow === 'signup-email'}
-              onToggle={() => toggleRow('signup-email')}
-              cols={[
-                <div className="flex items-center gap-2 min-w-0">
-                  {expandedRow === 'signup-email'
-                    ? <ChevronUp className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                    : <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />}
-                  <div className="w-7 h-7 rounded bg-gray-100 flex items-center justify-center shrink-0">
-                    <Mail className="h-3.5 w-3.5 text-muted-foreground" />
+                </div>}
+              />
+              <TaskRow done={isDone('business-tools')} label="Connect your store"
+                onToggle={() => toggle('store')} expanded={expanded === 'store'}
+                onCheck={() => check('business-tools')}
+                rightSlot={<Button size="sm" className="h-7 text-xs" onClick={e => { e.stopPropagation(); check('business-tools'); }}>Connect</Button>}
+                expandedContent={<div className="p-4 text-xs text-muted-foreground space-y-3">
+                  <p>Connect Shopify or WooCommerce to sync products, orders, and enable revenue attribution.</p>
+                  <div className="flex gap-2">
+                    <Button size="sm" className="h-7 text-xs" onClick={() => { check('business-tools'); setLocation('/integrations'); }}>Connect Shopify</Button>
+                    <Button size="sm" variant="outline" className="h-7 text-xs">Connect WooCommerce</Button>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">Sign-up Form</p>
-                    <p className="text-[11px] text-muted-foreground truncate">Email List & Text Messaging List</p>
-                  </div>
-                </div>,
-                <Badge className="text-[11px] bg-blue-50 text-blue-700 border-0 hover:bg-blue-50">Popup</Badge>,
-                <div className="flex items-center gap-1">
-                  <Sparkles className="h-3.5 w-3.5 text-blue-500" />
-                  <span className="text-[12px] text-blue-600 font-medium">Suggested</span>
-                </div>,
-                <span className="text-sm text-muted-foreground">0</span>,
-              ]}
-              expandedContent={
-                <div className="px-5 py-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-foreground mb-1">Sign-up Form</p>
-                      <p className="text-xs text-muted-foreground leading-relaxed max-w-md">
-                        A multi-step sign-up form that collects email and text messaging consent, and
-                        confirms subscription to your list.
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-1 shrink-0">
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground">
-                        <ChevronDown className="h-4 w-4 rotate-90" />
-                      </Button>
-                      <span className="text-xs text-muted-foreground">1 / 3</span>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground">
-                        <ChevronDown className="h-4 w-4 -rotate-90" />
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="mt-3 flex gap-2">
-                    <Button size="sm" className="h-7 text-xs bg-black text-white hover:bg-gray-800">Create form</Button>
+                </div>}
+              />
+              <TaskRow done={isDone('branding')} label="Confirm brand settings"
+                onToggle={() => toggle('brand')} expanded={expanded === 'brand'}
+                onCheck={() => check('branding')}
+                rightSlot={<Button size="sm" variant="outline" className="h-7 text-xs" onClick={e => { e.stopPropagation(); check('branding'); }}>Review</Button>}
+                expandedContent={<div className="p-4 text-xs text-muted-foreground space-y-3">
+                  <p>Set your logo, brand colours, and sender name so every email looks on-brand.</p>
+                  <div className="flex gap-2">
+                    <Button size="sm" className="h-7 text-xs" onClick={() => { check('branding'); setLocation('/content/media-brand'); }}>Open Brand Settings</Button>
                     <Button size="sm" variant="outline" className="h-7 text-xs">Skip</Button>
                   </div>
-                </div>
-              }
-            />
+                </div>}
+              />
+            </SectionCard>
+          </motion.div>
 
-            {/* SMS opt-in */}
-            <TableRow
-              cols={[
-                <div className="flex items-center gap-2 min-w-0">
-                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                  <div className="w-7 h-7 rounded bg-gray-100 flex items-center justify-center shrink-0">
-                    <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
+          {/* ── Section 2: Grow audience ── */}
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            <SectionCard icon={Users} title="Grow your audience" description="Build your subscriber base with signup forms and list imports." completed={[isDone('signup-form'), isDone('import-contacts')].filter(Boolean).length} total={2}>
+              <TaskRow done={isDone('signup-form')} label="Create a signup form"
+                onToggle={() => toggle('form')} expanded={expanded === 'form'}
+                onCheck={() => check('signup-form')}
+                rightSlot={<Badge className="text-[10px] bg-blue-50 text-blue-700 border-0">Suggested</Badge>}
+                expandedContent={<div className="p-4 text-xs text-muted-foreground space-y-3">
+                  <p>A popup or inline form collects email and SMS consent. Drive subscribers from your website automatically.</p>
+                  <div className="flex gap-2">
+                    <Button size="sm" className="h-7 text-xs" onClick={() => { check('signup-form'); setLocation('/forms'); }}>Create Form</Button>
+                    <Button size="sm" variant="outline" className="h-7 text-xs">Skip</Button>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">SMS Opt-in Form</p>
-                    <p className="text-[11px] text-muted-foreground truncate">Text Messaging List</p>
+                </div>}
+              />
+              <TaskRow done={isDone('import-contacts')} label="Import existing contacts"
+                onToggle={() => toggle('import')} expanded={expanded === 'import'}
+                onCheck={() => check('import-contacts')}
+                rightSlot={<Badge className="text-[10px] bg-blue-50 text-blue-700 border-0">Suggested</Badge>}
+                expandedContent={<div className="p-4 text-xs text-muted-foreground space-y-3">
+                  <p>Upload a CSV or sync contacts from your ESP, CRM, or ecommerce platform.</p>
+                  <div className="flex gap-2">
+                    <Button size="sm" className="h-7 text-xs" onClick={() => { check('import-contacts'); setLocation('/customers'); }}>Import CSV</Button>
+                    <Button size="sm" variant="outline" className="h-7 text-xs">Skip</Button>
                   </div>
-                </div>,
-                <Badge className="text-[11px] bg-gray-100 text-gray-600 border-0 hover:bg-gray-100">Inline</Badge>,
-                <div className="flex items-center gap-1">
-                  <Sparkles className="h-3.5 w-3.5 text-blue-500" />
-                  <span className="text-[12px] text-blue-600 font-medium">Suggested</span>
-                </div>,
-                <span className="text-sm text-muted-foreground">0</span>,
-              ]}
-            />
-          </SectionCard>
+                </div>}
+              />
+            </SectionCard>
+          </motion.div>
 
-          {/* ─────────────────────────────────────────────
-              Section 3 — Automate with flows
-          ───────────────────────────────────────────── */}
-          <SectionCard
-            icon={GitBranch}
-            title="Automate your marketing with flows"
-            description="Create automated messages to engage customers at key moments."
-            badge="0 / 2 completed"
-          >
-            {/* Review / Skip tabs */}
-            <div className="flex items-center gap-0 border-b border-gray-100 px-4 pt-2 pb-0">
-              <button className="text-sm font-medium text-foreground border-b-2 border-black pb-2 pr-4">Review</button>
-              <button className="text-sm text-muted-foreground pb-2 px-4 hover:text-foreground">Skip</button>
-            </div>
-
-            <TableHeader cols={['Flow', 'Type', 'Trigger', 'Status', 'Deliveries']} />
-
-            <TableRow
-              cols={[
-                <div className="flex items-center gap-2 min-w-0">
-                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                  <div className="w-7 h-7 rounded bg-gray-100 flex items-center justify-center shrink-0">
-                    <Mail className="h-3.5 w-3.5 text-muted-foreground" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">Welcome Series (Email)</p>
-                    <p className="text-[11px] text-muted-foreground truncate">Added to List</p>
-                  </div>
-                </div>,
-                <Mail className="h-3.5 w-3.5 text-muted-foreground" />,
-                <div className="w-5 h-4 flex flex-col gap-0.5 justify-center">
-                  <span className="block h-px bg-muted-foreground/50 w-full" />
-                  <span className="block h-px bg-muted-foreground/50 w-full" />
-                  <span className="block h-px bg-muted-foreground/50 w-full" />
-                </div>,
-                <div className="flex items-center gap-1">
-                  <Sparkles className="h-3.5 w-3.5 text-blue-500" />
-                  <span className="text-[12px] text-blue-600 font-medium">Suggested</span>
-                </div>,
-                <span className="text-sm text-muted-foreground">-</span>,
-              ]}
-            />
-
-            <TableRow
-              cols={[
-                <div className="flex items-center gap-2 min-w-0">
-                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                  <div className="w-7 h-7 rounded bg-gray-100 flex items-center justify-center shrink-0">
-                    <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">Welcome Series (Text Message)</p>
-                    <p className="text-[11px] text-muted-foreground truncate">Subscribed to SMS Marketing</p>
-                  </div>
-                </div>,
-                <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />,
-                <div className="w-5 h-4 flex flex-col gap-0.5 justify-center">
-                  <span className="block h-px bg-muted-foreground/50 w-full" />
-                  <span className="block h-px bg-muted-foreground/50 w-full" />
-                  <span className="block h-px bg-muted-foreground/50 w-full" />
-                </div>,
-                <div className="flex items-center gap-1">
-                  <Sparkles className="h-3.5 w-3.5 text-blue-500" />
-                  <span className="text-[12px] text-blue-600 font-medium">Suggested</span>
-                </div>,
-                <span className="text-sm text-muted-foreground">-</span>,
-              ]}
-            />
-          </SectionCard>
-
-          {/* ─────────────────────────────────────────────
-              Section 4 — Engage with campaigns
-          ───────────────────────────────────────────── */}
-          <SectionCard
-            icon={Megaphone}
-            title="Engage your audience with campaigns"
-            description="Send your first email message using a ready-made campaign."
-            badge="Setup required"
-          >
-            <div className="p-4">
-              <AnimatePresence>
-                {!campaignBannerDismissed && (
-                  <motion.div
-                    initial={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 overflow-hidden"
-                  >
-                    <Sparkles className="h-4 w-4 text-blue-600 mt-0.5 shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-blue-800 mb-0.5">
-                        Unlock personalized campaign recommendations
-                      </p>
-                      <p className="text-xs text-blue-600 leading-relaxed">
-                        Review and confirm your branding to get personalized and branded campaign recommendations.
-                      </p>
+          {/* ── Section 3: Flows ── */}
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+            <SectionCard icon={GitBranch} title="Automate with flows" description="Set up triggered messages that run automatically for every customer." completed={[isDone('welcome-flow'), isDone('cart-flow')].filter(Boolean).length} total={2}>
+              {[
+                { key: 'welcome-flow', label: 'Welcome Series', desc: 'Greet new subscribers and introduce your brand.', icon: Mail, flow: 'Added to List', exp: 'welcome' },
+                { key: 'cart-flow',   label: 'Abandoned Cart',  desc: 'Recover lost revenue from shoppers who left without buying.', icon: Package, flow: 'Checkout Started', exp: 'cart' },
+              ].map(({ key, label, desc, icon: Icon, flow, exp }) => (
+                <TaskRow key={key} done={isDone(key)} label={label}
+                  onToggle={() => toggle(exp)} expanded={expanded === exp}
+                  onCheck={() => check(key)}
+                  rightSlot={<Badge className="text-[10px] bg-blue-50 text-blue-700 border-0"><Sparkles className="w-2.5 h-2.5 mr-0.5" />Suggested</Badge>}
+                  expandedContent={<div className="p-4 space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0"><Icon className="w-4 h-4 text-foreground" /></div>
+                      <div>
+                        <p className="text-xs font-semibold">{label}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
+                        <p className="text-[10px] text-muted-foreground mt-1">Trigger: <span className="font-medium text-foreground">{flow}</span></p>
+                      </div>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-7 text-xs shrink-0 bg-white border-blue-200 text-blue-700 hover:bg-blue-50"
-                    >
-                      Review
-                    </Button>
-                    <button
-                      onClick={() => setCampaignBannerDismissed(true)}
-                      className="text-blue-400 hover:text-blue-600 ml-1 shrink-0"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    <div className="flex gap-2">
+                      <Button size="sm" className="h-7 text-xs" onClick={() => { check(key); setLocation('/automations'); }}>Set Up Flow</Button>
+                      <Button size="sm" variant="outline" className="h-7 text-xs">Preview</Button>
+                    </div>
+                  </div>}
+                />
+              ))}
+            </SectionCard>
+          </motion.div>
 
-              {campaignBannerDismissed && (
-                <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mb-3">
-                    <Megaphone className="h-5 w-5 text-muted-foreground" />
+          {/* ── Section 4: Campaign ── */}
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+            <SectionCard icon={Megaphone} title="Send your first campaign" description="Broadcast a one-off message to your audience using a template." completed={isDone('first-campaign') ? 1 : 0} total={1}>
+              <div className="p-5">
+                <AnimatePresence>
+                  {!dismissed && (
+                    <motion.div initial={{ opacity: 1 }} exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
+                      className="flex items-start gap-3 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20 p-4 mb-4">
+                      <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-blue-900 dark:text-blue-200">Get personalised campaign recommendations</p>
+                        <p className="text-xs text-blue-700 dark:text-blue-400 mt-0.5">Complete your brand settings to unlock AI-generated campaigns tailored to your audience.</p>
+                      </div>
+                      <button onClick={() => setDismissed(true)} className="text-blue-400 hover:text-blue-600 shrink-0"><X className="w-4 h-4" /></button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-medium">Ready to broadcast?</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Use a pre-built template to send your first email in minutes.</p>
                   </div>
-                  <p className="text-sm font-medium text-foreground mb-1">Create your first campaign</p>
-                  <p className="text-xs text-muted-foreground mb-4 max-w-xs">
-                    Send a targeted message to your audience using one of our ready-made templates.
-                  </p>
-                  <Button size="sm" className="h-7 text-xs bg-black text-white hover:bg-gray-800">
-                    Create campaign
-                    <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
+                  <Button className="h-8 text-xs shrink-0" onClick={() => { check('first-campaign'); setLocation('/campaigns/create'); }}>
+                    Create Campaign <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
                   </Button>
                 </div>
-              )}
-            </div>
-          </SectionCard>
+              </div>
+            </SectionCard>
+          </motion.div>
+
+          {/* Completion banner */}
+          <AnimatePresence>
+            {completedSteps === totalSteps && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                className="rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50/40 dark:bg-emerald-950/20 p-5 flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-200">You're all set up! 🎉</p>
+                  <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-0.5">MarketFlow is fully configured. Head to your dashboard to track performance.</p>
+                </div>
+                <Button size="sm" className="h-8 text-xs shrink-0" onClick={() => setLocation('/home')}>
+                  Go to Dashboard <ArrowRight className="w-3.5 h-3.5 ml-1" />
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
         </div>
       </div>
