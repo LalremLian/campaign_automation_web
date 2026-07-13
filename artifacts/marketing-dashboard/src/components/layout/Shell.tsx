@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'wouter';
+import { useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
 import {
   Home,
@@ -7,9 +7,6 @@ import {
   SquarePen,
   Megaphone,
   GitBranch,
-  Globe,
-  Share2,
-  Headphones,
   Users,
   LayoutGrid,
   Puzzle,
@@ -21,9 +18,11 @@ import {
   Settings,
   LogOut,
   PieChart,
-  ImageIcon,
-  Video,
-  Phone
+  BarChart2,
+  ShoppingBag,
+  ShieldCheck,
+  FormInput,
+  Layers,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -82,43 +81,26 @@ function SubItem({ name, path, active }: any) {
   );
 }
 
-function ExpandableItem({ icon: Icon, name, expanded, onClick, children, path, active }: any) {
-  const [_, setLocation] = useLocation();
-
-  const handleToggle = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onClick();
-  }
-
+function ExpandableItem({ icon: Icon, name, expanded, onClick, children, active }: any) {
   return (
     <div>
-      <div className={cn(
-        "flex items-center w-full px-2.5 py-1.5 text-[13px] rounded-md transition-colors group cursor-pointer",
-        active 
-          ? "bg-gray-100 dark:bg-secondary text-foreground font-medium" 
-          : "text-muted-foreground hover:bg-gray-50 dark:hover:bg-secondary/50"
-      )}>
-        <button 
-          onClick={(e) => {
-            if (path) {
-              setLocation(path);
-            } else {
-              handleToggle(e);
-            }
-          }}
-          className="flex items-center flex-1 min-w-0"
-        >
-          <Icon className="w-4 h-4 mr-3 shrink-0" />
-          <span className="truncate">{name}</span>
-        </button>
-        <button 
-          onClick={handleToggle}
-          className="p-0.5 rounded-sm hover:bg-gray-200 dark:hover:bg-secondary text-muted-foreground shrink-0"
-        >
-          {expanded ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
-        </button>
-      </div>
-      
+      <button
+        onClick={onClick}
+        className={cn(
+          "flex items-center w-full px-2.5 py-1.5 text-[13px] rounded-md transition-colors",
+          active
+            ? "bg-gray-100 dark:bg-secondary text-foreground font-medium"
+            : "text-muted-foreground hover:bg-gray-50 dark:hover:bg-secondary/50"
+        )}
+      >
+        <Icon className="w-4 h-4 mr-3 shrink-0" />
+        <span className="truncate flex-1 text-left">{name}</span>
+        {expanded
+          ? <ChevronDown className="w-3 h-3 shrink-0" />
+          : <ChevronRight className="w-3 h-3 shrink-0" />
+        }
+      </button>
+
       {expanded && children && (
         <div className="mt-0.5 flex flex-col space-y-0.5">
           {children}
@@ -133,8 +115,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const { theme, setTheme } = useTheme();
   
   const [expanded, setExpanded] = useState<Record<string, boolean>>({
-    Content: true,
-    Flows: location.startsWith('/automations') || location.startsWith('/flows'),
+    Content: location.startsWith('/templates') || location.startsWith('/content'),
+    Flows: location.startsWith('/flows'),
+    Analytics: location.startsWith('/analytics'),
+    Ecommerce: location.startsWith('/ecommerce'),
+    Compliance: location.startsWith('/compliance'),
   });
 
   const toggleExpand = (name: string) => {
@@ -159,29 +144,48 @@ export function Shell({ children }: { children: React.ReactNode }) {
            <div className="my-3 border-t border-border/50 mx-2" />
            
            <SidebarItem icon={Megaphone} name="Campaigns" path="/campaigns" active={location.startsWith('/campaigns')} />
-           <ExpandableItem name="Flows" icon={GitBranch} expanded={!!expanded['Flows']} onClick={() => toggleExpand('Flows')} path="/flows/ai-image" active={location.startsWith('/flows')}>
+           <ExpandableItem name="Flows" icon={GitBranch} expanded={!!expanded['Flows']} onClick={() => toggleExpand('Flows')} active={location.startsWith('/flows')}>
              <SubItem name="AI Image" path="/flows/ai-image" active={location.startsWith('/flows/ai-image')} />
              <SubItem name="AI Video" path="/flows/ai-video" active={location.startsWith('/flows/ai-video')} />
              <SubItem name="AI Calls" path="/flows/ai-calls" active={location.startsWith('/flows/ai-calls')} />
            </ExpandableItem>
-           
+
            <div className="my-3 border-t border-border/50 mx-2" />
-           
-           <ExpandableItem name="Website" icon={Globe} expanded={!!expanded['Website']} onClick={() => toggleExpand('Website')} />
-           <ExpandableItem name="Social" icon={Share2} expanded={!!expanded['Social']} onClick={() => toggleExpand('Social')} />
-           <ExpandableItem name="Service" icon={Headphones} expanded={!!expanded['Service']} onClick={() => toggleExpand('Service')} />
-           <ExpandableItem name="Audience" icon={Users} expanded={!!expanded['Audience']} onClick={() => toggleExpand('Audience')} path="/customers" active={location.startsWith('/customers')} />
-           
-           <ExpandableItem name="Content" icon={LayoutGrid} expanded={!!expanded['Content']} onClick={() => toggleExpand('Content')}>
+
+           <SidebarItem icon={FormInput} name="Forms" path="/forms" active={location.startsWith('/forms')} />
+           <SidebarItem icon={Layers} name="Segments" path="/segments" active={location.startsWith('/segments')} />
+           <SidebarItem icon={Users} name="Audience" path="/customers" active={location.startsWith('/customers')} />
+
+           <ExpandableItem name="Content" icon={LayoutGrid} expanded={!!expanded['Content']} onClick={() => toggleExpand('Content')} active={location.startsWith('/templates') || location.startsWith('/content')}>
               <SubItem name="Templates" path="/templates" active={location.startsWith('/templates')} />
-              <SubItem name="Universal content" />
-              <SubItem name="Products" />
-              <SubItem name="Media & brand" />
-              <SubItem name="Coupons" />
+              <SubItem name="Universal Content" path="/content/universal-content" active={location.startsWith('/content/universal-content')} />
+              <SubItem name="Media & Brand" path="/content/media-brand" active={location.startsWith('/content/media-brand')} />
            </ExpandableItem>
-           
+
            <div className="my-3 border-t border-border/50 mx-2" />
-           
+
+           <ExpandableItem name="Analytics" icon={BarChart2} expanded={!!expanded['Analytics']} onClick={() => toggleExpand('Analytics')} active={location.startsWith('/analytics')}>
+             <SubItem name="Overview" path="/analytics" active={location === '/analytics'} />
+             <SubItem name="Revenue Attribution" path="/analytics/revenue-attribution" active={location.startsWith('/analytics/revenue-attribution')} />
+             <SubItem name="Deliverability" path="/analytics/deliverability" active={location.startsWith('/analytics/deliverability')} />
+             <SubItem name="Benchmarks" path="/analytics/benchmarks" active={location.startsWith('/analytics/benchmarks')} />
+             <SubItem name="A/B Tests" path="/analytics/ab-tests" active={location.startsWith('/analytics/ab-tests')} />
+           </ExpandableItem>
+
+           <ExpandableItem name="E-commerce" icon={ShoppingBag} expanded={!!expanded['Ecommerce']} onClick={() => toggleExpand('Ecommerce')} active={location.startsWith('/ecommerce')}>
+             <SubItem name="Catalog" path="/ecommerce/catalog" active={location.startsWith('/ecommerce/catalog')} />
+             <SubItem name="Coupons" path="/ecommerce/coupons" active={location.startsWith('/ecommerce/coupons')} />
+             <SubItem name="Predicted Analytics" path="/ecommerce/predicted-analytics" active={location.startsWith('/ecommerce/predicted-analytics')} />
+           </ExpandableItem>
+
+           <ExpandableItem name="Compliance" icon={ShieldCheck} expanded={!!expanded['Compliance']} onClick={() => toggleExpand('Compliance')} active={location.startsWith('/compliance')}>
+             <SubItem name="Audit Log" path="/compliance/audit-log" active={location.startsWith('/compliance/audit-log')} />
+             <SubItem name="Consent & Compliance" path="/compliance/consent" active={location.startsWith('/compliance/consent')} />
+             <SubItem name="Suppression List" path="/compliance/suppression-list" active={location.startsWith('/compliance/suppression-list')} />
+           </ExpandableItem>
+
+           <div className="my-3 border-t border-border/50 mx-2" />
+
            <SidebarItem icon={Puzzle} name="Integrations" path="/integrations" active={location.startsWith('/integrations')} />
          </nav>
          
