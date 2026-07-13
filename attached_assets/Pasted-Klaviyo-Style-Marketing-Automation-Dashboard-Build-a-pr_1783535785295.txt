@@ -1,0 +1,339 @@
+Klaviyo-Style Marketing Automation Dashboard
+
+Build a premium, modern SaaS web application inspired by Klaviyo. This is a clickable UI prototype with mock functionality only. The goal is to impress clients with a clean, professional interface that demonstrates the product vision. No real backend is required—use mock data, local state, and realistic interactions.
+
+## Tech Stack
+
+* React 19
+* TypeScript
+* Vite
+* Tailwind CSS
+* shadcn/ui
+* React Router
+* TanStack Query (mock data)
+* Recharts
+* Lucide Icons
+* Framer Motion
+
+## Design Style
+
+* Clean SaaS design
+* Klaviyo-inspired layout (do not copy branding)
+* Modern spacing and typography
+* Minimalistic interface
+* Rounded cards (12–16px radius)
+* Soft shadows
+* Light theme with dark mode toggle
+* Green accent (#00C875) with neutral grays
+* Fully responsive
+* Smooth animations and transitions
+
+---
+
+## Authentication
+
+Create beautiful pages for:
+
+* Login
+* Register
+* Forgot Password
+
+Use mock authentication only.
+
+---
+
+## Main Layout
+
+Responsive dashboard layout containing:
+
+* Left collapsible sidebar
+* Top navigation bar
+* User profile dropdown
+* Search bar
+* Notification icon
+* Organization switcher
+
+Sidebar Navigation:
+
+* Dashboard
+* Customers
+* Segments
+* Campaigns
+* Templates
+* Automations
+* Analytics
+* Integrations
+* Settings
+
+---
+
+## Dashboard
+
+Create an executive dashboard with beautiful charts and statistics.
+
+Top KPI Cards:
+
+* Total Customers
+* Active Campaigns
+* Revenue Generated
+* Open Rate
+* Click Rate
+* Conversion Rate
+
+Charts:
+
+* Revenue Trend
+* Email Performance
+* Campaign Growth
+* Customer Growth
+* Device Distribution
+* Geographic Audience
+
+Recent Activity Card:
+
+* Campaign Sent
+* New Customer
+* Shopify Sync
+* Automation Triggered
+
+Upcoming Scheduled Campaigns Card.
+
+---
+
+## Customers Module
+
+Customer Table:
+
+* Avatar
+* Name
+* Email
+* Phone
+* Country
+* Total Orders
+* Total Spend
+* Last Purchase
+* Status
+* Tags
+
+Features:
+
+* Search
+* Filter
+* Sort
+* Pagination
+* Customer Details Drawer
+* Customer Timeline
+* Purchase History
+* Notes
+* Tags
+
+Use realistic mock data.
+
+---
+
+## Campaigns
+
+Campaign List:
+
+* Draft
+* Scheduled
+* Sending
+* Completed
+
+Campaign Card:
+
+* Campaign Name
+* Audience
+* Status
+* Delivery %
+* Open Rate
+* Click Rate
+* Revenue
+
+Buttons:
+
+* Create Campaign
+* Duplicate
+* Preview
+* Schedule
+* Send
+
+Create Campaign Wizard:
+Step 1
+Choose Campaign Type
+
+* Email
+* Push Notification
+
+Step 2
+Select Audience
+
+Step 3
+Choose Template
+
+Step 4
+Compose Message
+
+Step 5
+Preview
+
+Step 6
+Schedule or Send
+
+Display success animations after completion.
+
+---
+
+## Templates
+
+Beautiful email template gallery.
+
+Categories:
+
+* Newsletter
+* Promotion
+* Welcome
+* Abandoned Cart
+* Product Launch
+
+Include a simple drag-and-drop style editor mockup (UI only).
+
+---
+
+## Automations
+
+Workflow Builder UI.
+
+Show automation cards connected visually:
+
+Trigger
+↓
+Condition
+↓
+Delay
+↓
+Email
+↓
+Wait
+↓
+Push Notification
+↓
+Goal
+
+Include automation templates:
+
+* Welcome Series
+* Abandoned Cart
+* Win Back
+* Birthday Campaign
+* Order Follow-up
+
+Mock interactions only.
+
+---
+
+## Analytics
+
+Beautiful analytics dashboard with:
+
+* Revenue
+* Open Rate
+* Click Rate
+* Bounce Rate
+* Conversion Rate
+* Top Campaigns
+* Top Performing Templates
+* Customer Growth
+* Geographic Distribution
+
+Use animated Recharts with mock datasets.
+
+---
+
+## Integrations
+
+Integration cards with connect buttons:
+
+* Shopify
+* WooCommerce
+* Stripe
+* Mailchimp
+* Zapier
+* Slack
+* Google Analytics
+
+Show:
+Connected
+Not Connected
+Sync Status
+
+Use mock connection states only.
+
+---
+
+## Settings
+
+Pages:
+
+* Profile
+* Organization
+* Team Members
+* API Keys
+* Notifications
+* Billing
+* Appearance
+* Security
+
+---
+
+## UI Components
+
+Create reusable components:
+
+* Data Table
+* Metric Card
+* Chart Card
+* Status Badge
+* Avatar
+* Buttons
+* Modals
+* Drawers
+* Toast Notifications
+* Loading Skeletons
+* Empty States
+
+---
+
+## UX
+
+* Beautiful loading skeletons
+* Smooth page transitions
+* Hover animations
+* Animated charts
+* Responsive design
+* Keyboard accessible
+* Professional SaaS feel
+* Production-quality code structure
+
+---
+
+## Mock Data
+
+Generate realistic demo data:
+
+* 5,000+ customers
+* 20 campaigns
+* Revenue analytics
+* Customer purchases
+* Campaign statistics
+* Activity logs
+* Notifications
+* Automation workflows
+
+Everything should appear realistic without requiring a backend.
+
+---
+
+## Deliverable
+
+Produce a polished, investor-ready React dashboard that feels like a real marketing automation platform. Every page should be clickable, visually complete, and populated with realistic mock data. The code should follow best practices with reusable components, modular architecture, and be easy to connect to a real NestJS backend in the future.
