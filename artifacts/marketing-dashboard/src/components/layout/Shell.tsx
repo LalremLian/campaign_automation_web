@@ -2,40 +2,98 @@ import React, { useState } from 'react';
 import { useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
 import {
-  Home,
-  CircleDot,
-  SquarePen,
-  Megaphone,
-  GitBranch,
-  Users,
-  LayoutGrid,
-  Puzzle,
-  Search,
-  Bell,
-  Wand2,
-  ChevronRight,
-  ChevronDown,
-  Settings,
-  LogOut,
-  PieChart,
-  BarChart2,
-  ShoppingBag,
-  ShieldCheck,
-  FormInput,
-  Layers,
+  Home, CircleDot, SquarePen, Megaphone, GitBranch,
+  Users, LayoutGrid, Puzzle, Search, Bell, Wand2,
+  ChevronRight, ChevronDown, Settings, LogOut, PieChart,
+  BarChart2, ShoppingBag, ShieldCheck, Layers, Zap,
+  X, CheckCircle2, AlertCircle, Info, Mail,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from '@/components/theme-provider';
+
+// ─── Notifications Panel ─────────────────────────────────────────────────────
+
+const notifications = [
+  { id: 1, icon: Mail,         color: 'bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400',    title: 'Campaign sent successfully',          body: 'Black Friday Early Access sent to 12,400 recipients.',  time: '2h ago',  read: false },
+  { id: 2, icon: CheckCircle2, color: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400', title: 'Flow triggered 84 times',       body: 'Abandoned Cart flow recovered $3,240 today.',           time: '4h ago',  read: false },
+  { id: 3, icon: AlertCircle,  color: 'bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-400',  title: 'Deliverability warning',              body: 'Bounce rate for Yahoo/AOL reached 1.4% — above threshold.', time: '6h ago',  read: false },
+  { id: 4, icon: Info,         color: 'bg-secondary text-muted-foreground',                                title: 'Shopify sync completed',              body: '1,240 new orders synced successfully.',                 time: '1d ago',  read: true  },
+  { id: 5, icon: CheckCircle2, color: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400', title: '420 new subscribers added',     body: 'Via homepage popup form — your best day this week.',    time: '1d ago',  read: true  },
+  { id: 6, icon: Info,         color: 'bg-secondary text-muted-foreground',                                title: 'Weekly analytics report ready',       body: 'Revenue up 18.4% vs last week.',                        time: '2d ago',  read: true  },
+];
+
+function NotificationsPanel({ onClose }: { onClose: () => void }) {
+  const [, setLocation] = useLocation();
+  const [items, setItems] = useState(notifications);
+  const unread = items.filter(n => !n.read).length;
+
+  const markAllRead = () => setItems(p => p.map(n => ({ ...n, read: true })));
+
+  return (
+    <div className="absolute top-14 right-0 w-[380px] bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-semibold">Notifications</span>
+          {unread > 0 && (
+            <Badge className="h-4 px-1.5 text-[10px] bg-foreground text-background">{unread}</Badge>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {unread > 0 && (
+            <button onClick={markAllRead} className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">
+              Mark all read
+            </button>
+          )}
+          <button onClick={onClose} className="w-6 h-6 flex items-center justify-center rounded-md hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground">
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Items */}
+      <div className="max-h-[420px] overflow-y-auto divide-y divide-border/50">
+        {items.map(n => {
+          const Icon = n.icon;
+          return (
+            <div key={n.id}
+              onClick={() => setItems(p => p.map(x => x.id === n.id ? { ...x, read: true } : x))}
+              className={`flex items-start gap-3 px-4 py-3.5 cursor-pointer hover:bg-secondary/30 transition-colors ${!n.read ? 'bg-secondary/10' : ''}`}>
+              <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${n.color}`}>
+                <Icon className="w-3.5 h-3.5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2">
+                  <p className={`text-xs leading-snug ${!n.read ? 'font-semibold' : 'font-medium'}`}>{n.title}</p>
+                  {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-foreground shrink-0 mt-1.5" />}
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{n.body}</p>
+                <p className="text-[10px] text-muted-foreground/60 mt-1">{n.time}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Footer */}
+      <div className="px-4 py-2.5 border-t border-border/60">
+        <button
+          onClick={() => { setLocation('/compliance/audit-log'); onClose(); }}
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors w-full text-center"
+        >
+          View all activity in Audit Log →
+        </button>
+      </div>
+    </div>
+  );
+}
 
 function SidebarItem({ icon: Icon, name, path, active, disabled, onClick }: any) {
   const [_, setLocation] = useLocation();
@@ -113,6 +171,9 @@ function ExpandableItem({ icon: Icon, name, expanded, onClick, children, active 
 export function Shell({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();
   const { theme, setTheme } = useTheme();
+  const [showNotifications, setShowNotifications] = useState(false);
+  
+  const unreadCount = notifications.filter(n => !n.read).length;
   
   const [expanded, setExpanded] = useState<Record<string, boolean>>({
     Content: location.startsWith('/templates') || location.startsWith('/content'),
@@ -139,11 +200,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
          <nav className="flex-1 overflow-y-auto px-2 pb-4 space-y-0.5 mt-2">
            <SidebarItem icon={CircleDot} name="Get started" path="/get-started" active={location.startsWith('/get-started')} />
            <SidebarItem icon={Home} name="Home" path="/home" active={location === '/home' || location === '/dashboard'} />
-           <SidebarItem icon={SquarePen} name="Composer" />
+           <SidebarItem icon={SquarePen} name="Composer" path="/home" active={false} />
            
            <div className="my-3 border-t border-border/50 mx-2" />
            
            <SidebarItem icon={Megaphone} name="Campaigns" path="/campaigns" active={location.startsWith('/campaigns')} />
+           <SidebarItem icon={Zap} name="Automations" path="/automations" active={location.startsWith('/automations')} />
            <ExpandableItem name="Flows" icon={GitBranch} expanded={!!expanded['Flows']} onClick={() => toggleExpand('Flows')} active={location.startsWith('/flows')}>
              <SubItem name="AI Image" path="/flows/ai-image" active={location.startsWith('/flows/ai-image')} />
              <SubItem name="AI Video" path="/flows/ai-video" active={location.startsWith('/flows/ai-video')} />
@@ -152,7 +214,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
            <div className="my-3 border-t border-border/50 mx-2" />
 
-           <SidebarItem icon={FormInput} name="Forms" path="/forms" active={location.startsWith('/forms')} />
            <SidebarItem icon={Layers} name="Segments" path="/segments" active={location.startsWith('/segments')} />
            <SidebarItem icon={Users} name="Audience" path="/customers" active={location.startsWith('/customers')} />
 
@@ -231,7 +292,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
       {/* Main Content */}
       <div className="flex flex-col flex-1 overflow-hidden">
         {/* Top Navbar */}
-        <header className="h-14 border-b bg-white dark:bg-card flex items-center justify-between px-4 shrink-0">
+        <header className="h-14 border-b bg-white dark:bg-card flex items-center justify-between px-4 shrink-0 relative">
           <div className="flex-1" />
           
           <div className="relative flex items-center justify-center flex-1 w-full max-w-[400px]">
@@ -248,19 +309,50 @@ export function Shell({ children }: { children: React.ReactNode }) {
           </div>
           
           <div className="flex-1 flex items-center justify-end gap-1 sm:gap-2">
-             <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-               <Bell className="h-[18px] w-[18px]" />
-             </Button>
-             <Button variant="outline" size="sm" className="h-8 text-xs px-3 rounded-md font-medium shadow-none hidden sm:inline-flex">
+             {/* Bell — notifications panel */}
+             <div className="relative">
+               <Button
+                 variant="ghost" size="icon"
+                 className="h-8 w-8 text-muted-foreground hover:text-foreground relative"
+                 onClick={() => setShowNotifications(v => !v)}
+               >
+                 <Bell className="h-[18px] w-[18px]" />
+                 {unreadCount > 0 && (
+                   <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-foreground" />
+                 )}
+               </Button>
+               {showNotifications && (
+                 <NotificationsPanel onClose={() => setShowNotifications(false)} />
+               )}
+             </div>
+
+             {/* Account plan → Settings billing tab */}
+             <Button
+               variant="outline" size="sm"
+               className="h-8 text-xs px-3 rounded-md font-medium shadow-none hidden sm:inline-flex"
+               onClick={() => setLocation('/settings?tab=billing')}
+             >
                Account plan
              </Button>
-             <Button variant="ghost" size="sm" className="h-8 text-xs px-3 font-medium text-muted-foreground hover:text-foreground hidden sm:inline-flex">
+
+             {/* Support → Settings support tab */}
+             <Button
+               variant="ghost" size="sm"
+               className="h-8 text-xs px-3 font-medium text-muted-foreground hover:text-foreground hidden sm:inline-flex"
+               onClick={() => setLocation('/settings?tab=support')}
+             >
                Support
              </Button>
+
              <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
                <Wand2 className="h-[18px] w-[18px]" />
              </Button>
           </div>
+
+          {/* Click outside overlay to close notifications */}
+          {showNotifications && (
+            <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)} />
+          )}
         </header>
 
         {/* Page Content */}

@@ -10,7 +10,7 @@ export default function Register() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLocation('/dashboard');
+    setLocation('/get-started');
   };
 
   return (

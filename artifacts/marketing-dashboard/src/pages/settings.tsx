@@ -1,4 +1,5 @@
 /*  */import React, { useState } from 'react';
+import { useSearch } from 'wouter';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -490,7 +491,9 @@ const navItems: { value: TabValue; label: string; icon: React.ElementType }[] = 
 // ─── Main Settings Page ───────────────────────────────────────────────────────
 
 export default function Settings() {
-  const [activeTab, setActiveTab] = useState<TabValue>('profile');
+  const search = useSearch();
+  const tabParam = new URLSearchParams(search).get('tab') as TabValue | null;
+  const [activeTab, setActiveTab] = useState<TabValue>(tabParam ?? 'profile');
 
   return (
     <div className="p-6 lg:p-8 max-w-[1200px] mx-auto">

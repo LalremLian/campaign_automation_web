@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Link, useLocation } from 'wouter';
+import { useLocation } from 'wouter';
 import { ArrowLeft } from 'lucide-react';
 
 export default function ForgotPassword() {
@@ -11,7 +11,6 @@ export default function ForgotPassword() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate sending email
     setLocation('/login');
   };
 
@@ -43,11 +42,12 @@ export default function ForgotPassword() {
             </form>
             
             <div className="mt-6 text-center">
-              <Link href="/login">
-                <a className="text-sm font-medium text-muted-foreground hover:text-foreground flex items-center justify-center">
-                  <ArrowLeft className="w-4 h-4 mr-2" /> Back to sign in
-                </a>
-              </Link>
+              <button
+                onClick={() => setLocation('/login')}
+                className="text-sm font-medium text-muted-foreground hover:text-foreground flex items-center justify-center gap-2 mx-auto"
+              >
+                <ArrowLeft className="w-4 h-4" /> Back to sign in
+              </button>
             </div>
           </CardContent>
         </Card>

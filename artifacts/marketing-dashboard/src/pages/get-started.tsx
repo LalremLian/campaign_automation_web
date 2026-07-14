@@ -205,7 +205,7 @@ export default function GetStarted() {
                 expandedContent={<div className="p-4 text-xs text-muted-foreground space-y-3">
                   <p>A popup or inline form collects email and SMS consent. Drive subscribers from your website automatically.</p>
                   <div className="flex gap-2">
-                    <Button size="sm" className="h-7 text-xs" onClick={() => { check('signup-form'); setLocation('/forms'); }}>Create Form</Button>
+                    <Button size="sm" className="h-7 text-xs" onClick={() => { check('signup-form'); setLocation('/segments'); }}>Create Form</Button>
                     <Button size="sm" variant="outline" className="h-7 text-xs">Skip</Button>
                   </div>
                 </div>}

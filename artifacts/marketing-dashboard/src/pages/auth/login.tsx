@@ -83,7 +83,7 @@ export default function Login() {
 
             {/* Forgot password */}
             <div>
-              <button type="button" className="text-sm text-foreground underline underline-offset-2 hover:opacity-70 transition-opacity">
+              <button type="button" onClick={() => setLocation('/forgot-password')} className="text-sm text-foreground underline underline-offset-2 hover:opacity-70 transition-opacity">
                 Forgot your password?
               </button>
             </div>
