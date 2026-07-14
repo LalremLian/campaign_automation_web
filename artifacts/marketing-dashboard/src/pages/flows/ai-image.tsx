@@ -7,6 +7,8 @@ import {
   Wand2, Info, Star, TrendingUp,
 } from 'lucide-react';
 
+// ─── Data ─────────────────────────────────────────────────────
+
 const templates = [
   { id: 'hero',     label: 'Hero Banner',   desc: 'Full-width product showcase', ratio: '16:9' },
   { id: 'square',   label: 'Square Ad',     desc: 'Instagram / Facebook feed',   ratio: '1:1'  },
@@ -17,12 +19,12 @@ const templates = [
 ];
 
 const styles = [
-  { id: 'studio',    label: 'Studio',    desc: 'Clean bg, sharp shadows'  },
+  { id: 'studio',    label: 'Studio',    desc: 'Clean bg, sharp shadows' },
   { id: 'lifestyle', label: 'Lifestyle', desc: 'Natural light, real world' },
-  { id: 'minimal',   label: 'Minimal',   desc: 'Empty space, bold type'   },
-  { id: 'editorial', label: 'Editorial', desc: 'Magazine, high contrast'   },
-  { id: 'flat',      label: 'Flat lay',  desc: 'Overhead arrangement'     },
-  { id: 'dark',      label: 'Dark mode', desc: 'Moody, dark background'   },
+  { id: 'minimal',   label: 'Minimal',   desc: 'Empty space, bold type' },
+  { id: 'editorial', label: 'Editorial', desc: 'Magazine, high contrast' },
+  { id: 'flat',      label: 'Flat lay',  desc: 'Overhead arrangement' },
+  { id: 'dark',      label: 'Dark mode', desc: 'Moody, dark background' },
 ];
 
 const products = [
@@ -49,6 +51,8 @@ const gradients = [
   'from-blue-100 to-blue-50', 'from-violet-100 to-violet-50',
   'from-amber-100 to-amber-50', 'from-rose-100 to-rose-50',
 ];
+
+// ─── Sub-components ───────────────────────────────────────────
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">{children}</p>;
@@ -91,6 +95,8 @@ function ProductPicker({ selected, onSelect }: { selected: number | null; onSele
   );
 }
 
+// ─── Main page ────────────────────────────────────────────────
+
 export default function AIImage() {
   const [prompt, setPrompt] = useState('');
   const [generating, setGenerating] = useState(false);
@@ -105,8 +111,10 @@ export default function AIImage() {
   return (
     <div className="flex h-full overflow-hidden bg-background">
 
-      {/* ── LEFT: Config panel ── */}
+      {/* ── Config panel (left) ── */}
       <div className="w-[420px] border-r bg-card flex flex-col shrink-0 overflow-hidden">
+
+        {/* Header */}
         <div className="px-4 py-3.5 border-b flex items-center gap-3">
           <div className="w-8 h-8 bg-foreground rounded-xl flex items-center justify-center shadow-sm">
             <ImageIcon className="w-4 h-4 text-background" />
@@ -117,7 +125,8 @@ export default function AIImage() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-5 space-y-5">
+        {/* Scrollable config */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-5">
 
           {/* Prompt */}
           <div>
@@ -164,22 +173,22 @@ export default function AIImage() {
           {/* Style */}
           <div>
             <SectionLabel>Style</SectionLabel>
-            <div className="grid grid-cols-2 gap-1.5">
+            <div className="space-y-1">
               {styles.map(s => (
                 <button key={s.id} onClick={() => setSelectedStyle(s.id)}
-                  className={`text-left p-2.5 border rounded-lg transition-all text-xs
-                    ${selectedStyle === s.id ? 'border-foreground bg-foreground/5 ring-1 ring-foreground' : 'border-border hover:border-foreground/30 bg-background'}`}>
-                  <div className="flex items-center justify-between mb-0.5">
-                    <span className="font-semibold text-[11px]">{s.label}</span>
-                    {selectedStyle === s.id && <Check className="w-3 h-3 text-foreground" />}
+                  className={`w-full flex items-center justify-between px-3 py-2 border rounded-lg text-xs transition-all
+                    ${selectedStyle === s.id ? 'border-foreground bg-foreground/5' : 'border-border hover:border-foreground/30 bg-background'}`}>
+                  <div className="text-left">
+                    <span className="font-medium block text-[11px]">{s.label}</span>
+                    <span className="text-[10px] text-muted-foreground">{s.desc}</span>
                   </div>
-                  <span className="text-[10px] text-muted-foreground">{s.desc}</span>
+                  {selectedStyle === s.id && <Check className="w-3.5 h-3.5 text-foreground shrink-0" />}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Aspect Ratio */}
+          {/* Aspect ratio */}
           <div>
             <SectionLabel>Aspect Ratio</SectionLabel>
             <div className="flex gap-1.5">
@@ -208,17 +217,18 @@ export default function AIImage() {
         {/* Generate button */}
         <div className="p-4 border-t space-y-2 shrink-0">
           <Button onClick={handleGenerate} disabled={generating} className="w-full h-10 gap-2">
-            {generating
-              ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" />Generating…</>
+            {generating ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" />Generating…</>
               : <><Sparkles className="w-3.5 h-3.5" />Generate Creative</>}
           </Button>
           <p className="text-[10px] text-center text-muted-foreground">4 generations remaining today</p>
         </div>
       </div>
 
-      {/* ── RIGHT: Gallery ── */}
+      {/* ── Gallery (right) ── */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="px-5 h-12 border-b flex items-center justify-between shrink-0 bg-card/50">
+
+        {/* Gallery toolbar */}
+        <div className="px-5 py-3 border-b bg-card/50 shrink-0 flex items-center justify-between">
           <div className="flex items-center gap-5 text-sm">
             {[['4', 'Creatives'], ['4.4%', 'Avg CTR'], ['6', 'Flow uses']].map(([v, l]) => (
               <div key={l} className="flex items-center gap-1.5">
@@ -232,8 +242,9 @@ export default function AIImage() {
           </Button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-5 bg-secondary/10">
-          <div className="grid grid-cols-2 xl:grid-cols-3 gap-4">
+        {/* Image grid */}
+        <div className="flex-1 overflow-y-auto p-6 bg-secondary/10">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {generated.map((img, idx) => (
               <div key={img.id}
                 className="bg-card border border-border/60 rounded-xl overflow-hidden cursor-pointer hover:shadow-md hover:border-border transition-all group">
@@ -241,7 +252,7 @@ export default function AIImage() {
                   <div className="absolute inset-0 opacity-[0.05]"
                     style={{ backgroundImage: 'repeating-linear-gradient(45deg,#000 0,#000 1px,transparent 0,transparent 50%)', backgroundSize: '8px 8px' }} />
                   <div className="flex flex-col items-center gap-1.5 z-10">
-                    <ImageIcon className="w-6 h-6 text-foreground/20" />
+                    <ImageIcon className="w-7 h-7 text-foreground/20" />
                     <span className="text-[9px] font-semibold text-foreground/30 uppercase tracking-widest">Preview</span>
                   </div>
                   <div className="absolute top-2 left-2 right-2 flex items-start justify-between">
@@ -286,7 +297,6 @@ export default function AIImage() {
           </div>
         </div>
       </div>
-
     </div>
   );
 }
