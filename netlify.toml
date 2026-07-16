@@ -1,12 +1,10 @@
 [build]
-  # Run install + build from the monorepo root so workspace: deps resolve correctly
-  command = "pnpm install && pnpm --filter @workspace/marketing-dashboard run build"
+  command = "pnpm install --no-frozen-lockfile && pnpm --filter @workspace/marketing-dashboard run build"
   publish = "client/dist/public"
 
 [build.environment]
   NODE_VERSION  = "20"
-  PNPM_VERSION  = "9"
-  # Force full install (not --prod) so devDependencies are available during build
+  PNPM_VERSION  = "11"
   NODE_ENV      = "development"
 
 [[redirects]]
