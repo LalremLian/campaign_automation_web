@@ -3,7 +3,7 @@
   publish = "client/dist/public"
 
 [build.environment]
-  NODE_VERSION  = "20"
+  NODE_VERSION  = "22"
   PNPM_VERSION  = "11"
   NODE_ENV      = "development"
 
