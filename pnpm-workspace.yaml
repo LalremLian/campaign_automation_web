@@ -30,7 +30,8 @@ minimumReleaseAge: 1440
 minimumReleaseAgeExclude: []
 
 packages:
-  - artifacts/*
+  - client
+  - server
   - lib/*
   - lib/integrations/*
   - scripts

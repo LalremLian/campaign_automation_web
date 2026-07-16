@@ -1,52 +1,67 @@
-# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# ─── Dependencies ────────────────────────────────────────────
+node_modules/
+.pnpm-store/
 
-# compiled output
-dist
-tmp
-out-tsc
+# ─── Build outputs ───────────────────────────────────────────
+dist/
+build/
+out/
+tmp/
+.expo/
+.expo-shared/
+
+# ─── TypeScript ──────────────────────────────────────────────
 *.tsbuildinfo
-.expo
-.expo-shared
+lib/*/dist/
+lib/*/tsconfig.tsbuildinfo
+client/tsconfig.tsbuildinfo
+server/tsconfig.tsbuildinfo
 
-# dependencies
-node_modules
+# ─── Vite cache ──────────────────────────────────────────────
+client/node_modules/.vite/
+client/node_modules/.vite-temp/
 
-# IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-
-# misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-yarn-error.log
-testem.log
-/typings
-
-# System Files
-.DS_Store
-Thumbs.db
-
-.cursor/rules/nx-rules.mdc
-.github/instructions/nx.instructions.md
-
+# ─── Environment variables ───────────────────────────────────
 .env
 .env.local
+.env.*.local
+# Keep .env.example (it's documentation — safe to commit)
+!.env.example
 
-# Replit / local cache
+# ─── Logs ────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-error.log
+pnpm-debug.log*
+
+# ─── OS / System ─────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── IDE ─────────────────────────────────────────────────────
+.idea/
+*.sublime-workspace
+*.sublime-project
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# ─── Replit (not needed locally) ─────────────────────────────
+.replit-artifact/
 .local/
 .cache/
+replit.nix
+.replit
+
+# ─── Reference / scratch assets ──────────────────────────────
+attached_assets/
+
+# ─── Coverage & testing ──────────────────────────────────────
+coverage/
+.nyc_output/
+
+# ─── pnpm lock (optional: keep if you want reproducible installs) ──
+# pnpm-lock.yaml
