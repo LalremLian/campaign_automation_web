@@ -537,7 +537,17 @@ function Footer() {
           ))}
         </div>
         <div className="pt-8 border-t border-border/50 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} MarketFlow Inc. All rights reserved.</p>
+          <p>
+            Developed by{' '}
+            <a
+              href="https://www.linkedin.com/company/lazy-developer/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-foreground hover:underline transition-colors"
+            >
+              Lazy Developer
+            </a>
+          </p>
           <div className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             <span>All systems operational</span>
