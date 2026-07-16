@@ -74,3 +74,6 @@ overrides:
 
 approvedBuilds:
   - esbuild
+
+allowBuilds:
+  esbuild: true
