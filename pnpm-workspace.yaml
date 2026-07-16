@@ -25,7 +25,7 @@
 #     - typescript
 #
 # ============================================================================
-minimumReleaseAge: 1440
+minimumReleaseAge: 0
 
 minimumReleaseAgeExclude: []
 
@@ -73,4 +73,4 @@ overrides:
   esbuild: "0.27.3"
 
 allowBuilds:
-  esbuild: set this to true or false
+  - esbuild
