@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
 import {
-  Home, CircleDot, SquarePen, Megaphone, GitBranch,
-  Users, LayoutGrid, Puzzle, Search, Bell, Wand2,
+  Home, CircleDot, Megaphone, GitBranch,
+  Users, LayoutGrid, Puzzle, Search, Bell,
   ChevronRight, ChevronDown, Settings, LogOut, PieChart,
   BarChart2, ShoppingBag, ShieldCheck, Layers, Zap,
   X, CheckCircle2, AlertCircle, Info, Mail,
@@ -200,7 +200,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
          <nav className="flex-1 overflow-y-auto px-2 pb-4 space-y-0.5 mt-2">
            <SidebarItem icon={CircleDot} name="Get started" path="/get-started" active={location.startsWith('/get-started')} />
            <SidebarItem icon={Home} name="Home" path="/home" active={location === '/home' || location === '/dashboard'} />
-           <SidebarItem icon={SquarePen} name="Composer" path="/home" active={false} />
            
            <div className="my-3 border-t border-border/50 mx-2" />
            
@@ -344,9 +343,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
                Support
              </Button>
 
-             <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
-               <Wand2 className="h-[18px] w-[18px]" />
-             </Button>
+
           </div>
 
           {/* Click outside overlay to close notifications */}
