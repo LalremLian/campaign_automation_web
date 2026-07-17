@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { cn } from '@/lib/utils';
 import {
@@ -172,6 +172,23 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();
   const { theme, setTheme } = useTheme();
   const [showNotifications, setShowNotifications] = useState(false);
+  const innerRef = useRef<HTMLDivElement>(null);
+
+  // Scale the 1280px desktop layout to fit any viewport width
+  useEffect(() => {
+    const DESIGN_WIDTH = 1280;
+    const applyScale = () => {
+      if (!innerRef.current) return;
+      const scale = Math.min(window.innerWidth / DESIGN_WIDTH, 1);
+      // zoom affects the full layout coordinate system including Radix portals
+      innerRef.current.style.zoom = String(scale);
+      innerRef.current.style.width = `${DESIGN_WIDTH}px`;
+      innerRef.current.style.height = `${window.innerHeight / scale}px`;
+    };
+    applyScale();
+    window.addEventListener('resize', applyScale);
+    return () => window.removeEventListener('resize', applyScale);
+  }, []);
   
   const unreadCount = notifications.filter(n => !n.read).length;
   
@@ -188,7 +205,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="app-shell-wrapper">
+      <div ref={innerRef} className="app-shell-inner flex overflow-hidden bg-background">
       {/* Sidebar */}
       <aside className="w-52 flex flex-col border-r bg-white dark:bg-sidebar shrink-0">
          <div className="flex items-center p-4 h-14">
@@ -357,6 +375,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
+    </div>
     </div>
   );
 }

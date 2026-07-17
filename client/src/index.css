@@ -189,3 +189,28 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
+
+/* ── Desktop-lock for app shell pages ───────────────────────────────────────
+   All pages inside <Shell> are designed for desktop (≥1280px).
+   On narrower viewports the entire shell scales down proportionally via JS
+   so all content remains visible without horizontal scrolling.
+   Landing and auth pages are NOT wrapped in Shell — fully responsive.
+─────────────────────────────────────────────────────────────────────────── */
+.app-shell-wrapper {
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.app-shell-inner {
+  /* width and height set inline by Shell JS, zoom applied by JS */
+  transform-origin: top left;
+}
+
+.app-desktop-root {
+  min-width: 1280px;
+  overflow-x: auto;
+}
