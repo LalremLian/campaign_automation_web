@@ -539,12 +539,30 @@ function SupportPanel() {
   );
 }
 
-function GenericPanel({ label }: { label: string }) {
+// ─── Apps grid for "coming soon" panels ──────────────────────────────────────
+
+// ─── Coming-soon panel (one per channel tab) ─────────────────────────────────
+
+const TAB_COLORS: Record<string, { icon: string; text: string }> = {
+  email:    { icon: 'text-blue-500',    text: 'text-blue-500'    },
+  sms:      { icon: 'text-green-500',   text: 'text-green-500'   },
+  whatsapp: { icon: 'text-emerald-500', text: 'text-emerald-500' },
+  push:     { icon: 'text-violet-500',  text: 'text-violet-500'  },
+  data:     { icon: 'text-orange-500',  text: 'text-orange-500'  },
+  other:    { icon: 'text-pink-500',    text: 'text-pink-500'    },
+};
+
+function AppsComingSoonPanel({ tab, subLabel }: { tab: string; subLabel: string }) {
+  const color = TAB_COLORS[tab] ?? { icon: 'text-muted-foreground', text: 'text-muted-foreground' };
   return (
     <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
-      <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center"><Palette className="w-5 h-5 text-muted-foreground"/></div>
-      <p className="text-sm font-medium">{label}</p>
-      <p className="text-xs text-muted-foreground max-w-xs">This section is coming soon. Settings for {label.toLowerCase()} will be available here.</p>
+      <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
+        <Palette className={`w-5 h-5 ${color.icon}`} />
+      </div>
+      <p className={`text-sm font-medium ${color.text}`}>{subLabel}</p>
+      <p className="text-xs text-muted-foreground max-w-xs">
+        This section is coming soon. Settings for apps will be available here.
+      </p>
     </div>
   );
 }
@@ -560,18 +578,23 @@ function resolvePanel(topTab: TopTab, subId: string): React.ReactNode {
     if (subId === 'activity')   return <ActivityPanel />;
     if (subId === 'security')   return <SecurityPanel />;
     if (subId === 'appearance') return <AppearancePanel />;
-    return <GenericPanel label={subNavMap[topTab].find(s=>s.id===subId)?.label ?? subId} />;
+    const genLabel = subNavMap[topTab].find(s => s.id === subId)?.label ?? subId;
+    return <AppsComingSoonPanel tab="other" subLabel={genLabel} />;
   }
   if (topTab === 'billing') {
     if (subId === 'plans') return <BillingPanel />;
-    return <GenericPanel label={subNavMap[topTab].find(s=>s.id===subId)?.label ?? subId} />;
+    const billingLabel = subNavMap[topTab].find(s => s.id === subId)?.label ?? subId;
+    return <AppsComingSoonPanel tab="other" subLabel={billingLabel} />;
   }
   if (topTab === 'other') {
     if (subId === 'help')    return <HelpPanel />;
     if (subId === 'support') return <SupportPanel />;
-    return <GenericPanel label={subNavMap[topTab].find(s=>s.id===subId)?.label ?? subId} />;
+    const otherLabel = subNavMap[topTab].find(s => s.id === subId)?.label ?? subId;
+    return <AppsComingSoonPanel tab="other" subLabel={otherLabel} />;
   }
-  return <GenericPanel label={subNavMap[topTab]?.find(s=>s.id===subId)?.label ?? subId} />;
+  // Channel tabs: email, sms, whatsapp, push, data
+  const subLabel = subNavMap[topTab]?.find(s => s.id === subId)?.label ?? subId;
+  return <AppsComingSoonPanel tab={topTab} subLabel={subLabel} />;
 }
 
 // ─── Main Settings Page ───────────────────────────────────────────────────────

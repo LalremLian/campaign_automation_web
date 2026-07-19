@@ -589,49 +589,54 @@ export default function CreateCampaign() {
 
       {/* Body */}
       <div className="flex-1 overflow-y-auto px-8 py-6">
-        <div className="max-w-[860px] mx-auto">
+        <div className="max-w-[860px] mx-auto space-y-8">
           {step === 0 && <StepChannel value={state.channel} onChange={c => patch({ channel: c })} />}
           {step === 1 && <StepTemplate value={state.templateId} onChange={id => patch({ templateId: id })} />}
           {step === 2 && <StepContent channel={state.channel} state={state} onChange={patch} />}
           {step === 3 && <StepAudience state={state} onChange={patch} />}
           {step === 4 && <StepReview state={state} />}
+
+          {/* Inline navigation — always visible without scrolling */}
+          <div className="flex items-center justify-between pt-4 pb-2 border-t border-border/60">
+            <Button
+              variant="outline"
+              onClick={back}
+              disabled={step === 0}
+              className="h-10 px-6 text-sm gap-1.5 rounded-xl"
+            >
+              <ChevronLeft className="w-4 h-4" /> Back
+            </Button>
+
+            <div className="flex items-center gap-3">
+              {/* Step dots */}
+              <div className="flex items-center gap-1.5">
+                {STEPS.map((_, i) => (
+                  <div key={i} className={`rounded-full transition-all ${i === step ? 'w-5 h-2 bg-foreground' : i < step ? 'w-2 h-2 bg-foreground/50' : 'w-2 h-2 bg-border'}`} />
+                ))}
+              </div>
+
+              {step < 4 ? (
+                <Button
+                  onClick={next}
+                  disabled={!canNext()}
+                  className="h-10 px-6 text-sm gap-1.5 rounded-xl bg-foreground text-background hover:bg-foreground/90 disabled:opacity-40"
+                >
+                  Continue <ChevronRight className="w-4 h-4" />
+                </Button>
+              ) : (
+                <Button
+                  onClick={send}
+                  className="h-10 px-7 text-sm gap-1.5 rounded-xl bg-foreground text-background hover:bg-foreground/90"
+                >
+                  <Send className="w-4 h-4" /> Send Campaign
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="border-t px-8 py-3 flex items-center justify-between shrink-0 bg-background">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={back}
-          disabled={step === 0}
-          className="h-8 text-xs px-4"
-        >
-          <ChevronLeft className="w-3.5 h-3.5 mr-1" /> Back
-        </Button>
 
-        <div className="flex items-center gap-2">
-          {step < 4 ? (
-            <Button
-              size="sm"
-              onClick={next}
-              disabled={!canNext()}
-              className="h-8 text-xs px-5 bg-foreground text-background hover:bg-foreground/90"
-            >
-              Continue <ChevronRight className="w-3.5 h-3.5 ml-1" />
-            </Button>
-          ) : (
-            <Button
-              size="sm"
-              onClick={send}
-              className="h-8 text-xs px-5 bg-foreground text-background hover:bg-foreground/90"
-            >
-              <Send className="w-3.5 h-3.5 mr-1.5" />
-              Send Campaign
-            </Button>
-          )}
-        </div>
-      </div>
     </div>
   );
 }
