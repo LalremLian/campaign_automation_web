@@ -230,7 +230,7 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="max-w-[920px] mx-auto py-10 px-6 space-y-8">
+      <div className="w-full py-8 px-8 space-y-8 box-border">
         <div className="space-y-4 text-center">
           <Skeleton className="h-9 w-56 mx-auto" />
           <Skeleton className="h-[130px] w-full rounded-xl" />
@@ -248,7 +248,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="max-w-[920px] mx-auto py-10 px-4 sm:px-6 space-y-8">
+    <div className="w-full py-8 px-8 space-y-8 box-border">
 
       {/* ── Plan Recommendations Modal ── */}
       {showPlans && <PlanRecommendationsModal onClose={() => setShowPlans(false)} />}
@@ -302,22 +302,24 @@ export default function Dashboard() {
           <motion.div
             initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0, overflow: 'hidden' }} transition={{ duration: 0.2 }}
-            className="relative rounded-xl border border-blue-100 dark:border-blue-900/50 bg-gradient-to-r from-blue-50/80 to-indigo-50/60 dark:from-blue-950/30 dark:to-indigo-950/20 p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 overflow-hidden"
+            className="rounded-xl border border-blue-100 dark:border-blue-900/50 bg-gradient-to-r from-blue-50/80 to-indigo-50/60 dark:from-blue-950/30 dark:to-indigo-950/20 p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4"
           >
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shrink-0 shadow-md">
               <Zap className="w-6 h-6 text-white" />
             </div>
-            <div className="flex-1 pr-6 sm:pr-0">
+            <div className="flex-1">
               <p className="text-sm font-semibold text-blue-900 dark:text-blue-200">Unlock SMS to reach customers where it matters</p>
               <p className="text-xs text-blue-700/80 dark:text-blue-400 mt-0.5">SMS averages 98% open rates. Add it to your flows in minutes.</p>
             </div>
-            <Button size="sm" variant="outline" className="h-8 text-xs bg-white dark:bg-card border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 hover:bg-blue-50 shrink-0">
-              Enable SMS <ArrowRight className="w-3 h-3 ml-1" />
-            </Button>
-            <button onClick={() => setShowPromo(false)}
-              className="absolute top-2.5 right-2.5 w-6 h-6 flex items-center justify-center rounded-full text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors">
-              <X className="w-3.5 h-3.5" />
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <Button size="sm" variant="outline" className="h-8 text-xs bg-white dark:bg-card border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 hover:bg-blue-50">
+                Enable SMS <ArrowRight className="w-3 h-3 ml-1" />
+              </Button>
+              <button onClick={() => setShowPromo(false)}
+                className="w-7 h-7 flex items-center justify-center rounded-full text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors shrink-0">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

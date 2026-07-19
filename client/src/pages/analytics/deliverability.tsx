@@ -161,8 +161,8 @@ export default function Deliverability() {
                 <div key={label} className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">{label}</span>
                   {ok
-                    ? <Badge className="text-[10px] h-4 px-1.5 bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900">✓ Active</Badge>
-                    : <Badge variant="outline" className="text-[10px] h-4 px-1.5 text-amber-600">Set up</Badge>
+                    ? <Badge className="text-[10px] h-5 w-14 justify-center px-0 bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900">✓ Active</Badge>
+                    : <Badge variant="outline" className="text-[10px] h-5 w-14 justify-center px-0 text-amber-600">Set up</Badge>
                   }
                 </div>
               ))}
@@ -171,28 +171,26 @@ export default function Deliverability() {
         </Card>
 
         <Card className="border-border/60 lg:col-span-2">
-          <CardHeader className="pb-2">
+          <CardHeader className="pb-4">
             <CardTitle className="text-sm font-semibold">Performance by Email Provider</CardTitle>
             <CardDescription className="text-xs">Inbox placement rates across major providers</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="divide-y divide-border/60">
-              <div className="grid grid-cols-5 py-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                <div className="col-span-2">Provider</div>
-                <div className="text-right">Delivered</div>
-                <div className="text-right">Inbox Rate</div>
-                <div className="text-right">Status</div>
+          <CardContent className="space-y-5">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <span className="w-2/5">Provider</span>
+                <span>Delivered</span>
+                <span>Inbox Rate</span>
+                <span>Status</span>
               </div>
               {providers.map(p => (
-                <div key={p.name} className="grid grid-cols-5 py-3 items-center hover:bg-secondary/20 transition-colors">
-                  <div className="col-span-2 text-sm font-medium">{p.name}</div>
-                  <div className="text-right text-sm">{p.delivered}</div>
-                  <div className="text-right text-sm">{p.inbox}</div>
-                  <div className="text-right">
-                    <Badge variant="outline" className={`text-[10px] px-2 ${statusConfig[p.status as keyof typeof statusConfig].color}`}>
-                      {statusConfig[p.status as keyof typeof statusConfig].label}
-                    </Badge>
-                  </div>
+                <div key={p.name} className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground w-2/5">{p.name}</span>
+                  <span className="font-medium">{p.delivered}</span>
+                  <span className="font-medium">{p.inbox}</span>
+                  <Badge variant="outline" className={`text-[10px] h-5 w-14 justify-center px-0 ${statusConfig[p.status as keyof typeof statusConfig].color}`}>
+                    {statusConfig[p.status as keyof typeof statusConfig].label}
+                  </Badge>
                 </div>
               ))}
             </div>

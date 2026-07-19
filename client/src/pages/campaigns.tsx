@@ -85,6 +85,11 @@ function CampaignRow({ campaign }: { campaign: Campaign }) {
   const isEmail = campaign.type === 'Email';
   const Icon = isEmail ? Mail : Smartphone;
 
+  // Icon color by type
+  const iconStyle = isEmail
+    ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400'
+    : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400';
+
   const statusClass =
     campaign.status === 'Completed' ? 'bg-secondary/60 text-foreground' :
     campaign.status === 'Scheduled' ? 'border-foreground/40 text-foreground' :
@@ -94,8 +99,8 @@ function CampaignRow({ campaign }: { campaign: Campaign }) {
   return (
     <div className="flex items-center gap-3 border border-border/60 rounded-md px-4 py-2.5 bg-card hover:border-border transition-colors group">
       {/* Icon */}
-      <div className="p-1.5 rounded bg-secondary shrink-0">
-        <Icon className="w-3.5 h-3.5 text-foreground" />
+      <div className={`p-1.5 rounded shrink-0 ${iconStyle}`}>
+        <Icon className="w-3.5 h-3.5" />
       </div>
 
       {/* Name + meta */}
@@ -116,17 +121,17 @@ function CampaignRow({ campaign }: { campaign: Campaign }) {
       {/* Metrics */}
       {(campaign.status === 'Completed' || campaign.status === 'Sending') && (
         <div className="hidden md:flex items-center gap-5 text-right shrink-0">
-          <Metric label="Open" value={`${campaign.openRate}%`} />
-          <Metric label="Click" value={`${campaign.clickRate}%`} />
-          <Metric label="Revenue" value={`$${campaign.revenue.toLocaleString()}`} />
+          <Metric label="Open"    value={`${campaign.openRate}%`}               color="text-blue-600 dark:text-blue-400" />
+          <Metric label="Click"   value={`${campaign.clickRate}%`}              color="text-orange-500 dark:text-orange-400" />
+          <Metric label="Revenue" value={`$${campaign.revenue.toLocaleString()}`} color="text-emerald-600 dark:text-emerald-400" />
         </div>
       )}
 
-      {/* Actions */}
+      {/* Actions — all same fixed size */}
       <div className="flex items-center gap-1 shrink-0 ml-2">
-        {campaign.status === 'Draft' && <Button size="sm" className="h-7 text-xs px-2.5">Edit</Button>}
-        {campaign.status === 'Scheduled' && <Button size="sm" variant="outline" className="h-7 text-xs px-2.5">Cancel</Button>}
-        {campaign.status === 'Completed' && <Button size="sm" variant="outline" className="h-7 text-xs px-2.5">Report</Button>}
+        {campaign.status === 'Draft'     && <Button size="sm" className="h-7 w-16 text-xs px-0">Edit</Button>}
+        {campaign.status === 'Scheduled' && <Button size="sm" variant="outline" className="h-7 w-16 text-xs px-0">Cancel</Button>}
+        {campaign.status === 'Completed' && <Button size="sm" variant="outline" className="h-7 w-16 text-xs px-0">Report</Button>}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -150,11 +155,11 @@ function CampaignRow({ campaign }: { campaign: Campaign }) {
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
+function Metric({ label, value, color }: { label: string; value: string; color: string }) {
   return (
     <div className="text-right">
       <div className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</div>
-      <div className="text-xs font-semibold">{value}</div>
+      <div className={`text-xs font-semibold ${color}`}>{value}</div>
     </div>
   );
 }

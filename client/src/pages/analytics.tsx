@@ -2,10 +2,23 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
-  Area, AreaChart, Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid, ComposedChart, Line
+  Area, AreaChart, Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
+  CartesianGrid, ComposedChart, Line, Cell,
 } from 'recharts';
 import { revenueTrend, geographicAudience } from '@/lib/mock-data';
 import { Download, Calendar } from 'lucide-react';
+
+// Vibrant colors for each bar in Revenue vs Orders
+const BAR_COLORS = [
+  '#6366f1', '#8b5cf6', '#a855f7', '#ec4899', '#f43f5e',
+  '#f97316', '#eab308', '#22c55e', '#14b8a6', '#3b82f6',
+  '#06b6d4', '#84cc16',
+];
+
+// Colors for geographic distribution
+const GEO_COLORS = [
+  '#6366f1', '#3b82f6', '#22c55e', '#f97316', '#ec4899', '#8b5cf6',
+];
 
 export default function Analytics() {
   return (
@@ -72,15 +85,27 @@ export default function Analytics() {
           <div className="h-[400px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={revenueTrend} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                <defs>
+                  {BAR_COLORS.map((color, i) => (
+                    <linearGradient key={i} id={`barGrad${i}`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={color} stopOpacity={1} />
+                      <stop offset="100%" stopColor={color} stopOpacity={0.6} />
+                    </linearGradient>
+                  ))}
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                 <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} />
                 <YAxis yAxisId="left" stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} tickFormatter={(v) => `$${v/1000}k`} />
                 <YAxis yAxisId="right" orientation="right" stroke="hsl(var(--muted-foreground))" tickLine={false} axisLine={false} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '6px', border: '1px solid hsl(var(--border))' }}
+                <Tooltip
+                  contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '10px', border: '1px solid hsl(var(--border))' }}
                 />
-                <Bar yAxisId="right" dataKey="orders" fill="hsl(var(--chart-4))" radius={[4, 4, 0, 0]} maxBarSize={40} />
-                <Line yAxisId="left" type="monotone" dataKey="revenue" stroke="hsl(var(--foreground))" strokeWidth={3} dot={{r:4, fill:"hsl(var(--foreground))"}} activeDot={{r: 6}} />
+                <Bar yAxisId="right" dataKey="orders" radius={[6, 6, 0, 0]} maxBarSize={40}>
+                  {revenueTrend.map((_, i) => (
+                    <Cell key={i} fill={`url(#barGrad${i})`} />
+                  ))}
+                </Bar>
+                <Line yAxisId="left" type="monotone" dataKey="revenue" stroke="#f97316" strokeWidth={3} dot={{ r: 5, fill: '#f97316', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 7 }} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
@@ -96,11 +121,35 @@ export default function Analytics() {
           <CardContent>
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={geographicAudience} layout="vertical" margin={{ top: 0, right: 20, left: 20, bottom: 0 }}>
+                <BarChart data={geographicAudience} layout="vertical" margin={{ top: 0, right: 20, left: 10, bottom: 0 }}>
+                  <defs>
+                    {GEO_COLORS.map((color, i) => (
+                      <linearGradient key={i} id={`geoGrad${i}`} x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor={color} stopOpacity={0.9} />
+                        <stop offset="100%" stopColor={color} stopOpacity={0.5} />
+                      </linearGradient>
+                    ))}
+                  </defs>
                   <XAxis type="number" hide />
-                  <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} stroke="hsl(var(--foreground))" width={100} />
-                  <Tooltip cursor={{fill: 'hsl(var(--secondary))'}} contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '6px', border: '1px solid hsl(var(--border))' }} />
-                  <Bar dataKey="value" fill="hsl(var(--foreground))" radius={[0, 4, 4, 0]} />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    axisLine={false}
+                    tickLine={false}
+                    stroke="hsl(var(--foreground))"
+                    width={115}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <Tooltip
+                    cursor={{ fill: 'hsl(var(--secondary))' }}
+                    contentStyle={{ backgroundColor: 'hsl(var(--card))', borderRadius: '10px', border: '1px solid hsl(var(--border))' }}
+                    formatter={(v: number) => [`${v}%`, 'Share']}
+                  />
+                  <Bar dataKey="value" radius={[0, 6, 6, 0]}>
+                    {geographicAudience.map((_, i) => (
+                      <Cell key={i} fill={`url(#geoGrad${i})`} />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>

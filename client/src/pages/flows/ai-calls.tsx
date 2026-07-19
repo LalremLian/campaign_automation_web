@@ -140,7 +140,12 @@ export default function AICalls() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
                       <span className="text-xs font-semibold">{v.name}</span>
-                      <span className="text-[9px] font-mono text-muted-foreground bg-secondary px-1 py-0.5 rounded">{v.accent}</span>
+                      <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-md ${
+                        v.accent === 'American'   ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300' :
+                        v.accent === 'British'    ? 'bg-violet-50 text-violet-700 dark:bg-violet-950/50 dark:text-violet-300' :
+                        v.accent === 'Australian' ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300' :
+                        'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
+                      }`}>{v.accent}</span>
                     </div>
                     <span className="text-[10px] text-muted-foreground">{v.desc}</span>
                   </div>
@@ -229,7 +234,7 @@ export default function AICalls() {
                 <div className={`w-7 h-7 rounded-lg flex items-center justify-center mb-2 ${color}`}>
                   <Icon className="w-3.5 h-3.5" />
                 </div>
-                <p className="font-bold text-base leading-none">{value}</p>
+                <p className="font-extrabold text-xl leading-none">{value}</p>
                 <p className="text-[10px] text-muted-foreground mt-1">{label} · {sub}</p>
               </div>
             ))}
@@ -247,7 +252,7 @@ export default function AICalls() {
                   {f === 'all' ? 'All calls' : f}
                 </button>
               ))}
-              <span className="ml-auto text-[11px] text-muted-foreground">{filtered.length} calls</span>
+              <span className="ml-auto text-[11px] font-bold text-foreground">{filtered.length} calls</span>
             </div>
 
             <div className="flex-1 overflow-y-auto">
@@ -272,7 +277,7 @@ export default function AICalls() {
                           <div className={`h-full rounded-full ${call.score >= 80 ? 'bg-emerald-500' : call.score >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
                             style={{ width: `${call.score}%` }} />
                         </div>
-                        <span className="text-[10px] font-mono text-muted-foreground w-5 text-right">{call.score}</span>
+                        <span className={`text-[10px] font-bold w-5 text-right ${call.score >= 80 ? 'text-emerald-600' : call.score >= 50 ? 'text-amber-500' : 'text-red-500'}`}>{call.score}</span>
                       </div>
                     )}
                     <Badge variant="outline" className={`text-[9px] px-1.5 flex items-center gap-1 shrink-0 ${oc.color}`}>

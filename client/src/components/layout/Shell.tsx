@@ -252,11 +252,19 @@ export function Shell({ children }: { children: React.ReactNode }) {
     const DESIGN_WIDTH = 1280;
     const applyScale = () => {
       if (!innerRef.current) return;
-      const scale = Math.min(window.innerWidth / DESIGN_WIDTH, 1);
-      // zoom affects the full layout coordinate system including Radix portals
-      innerRef.current.style.zoom = String(scale);
-      innerRef.current.style.width = `${DESIGN_WIDTH}px`;
-      innerRef.current.style.height = `${window.innerHeight / scale}px`;
+      const vw = window.innerWidth;
+      if (vw < DESIGN_WIDTH) {
+        // Small screens: scale down to fit
+        const scale = vw / DESIGN_WIDTH;
+        innerRef.current.style.zoom = String(scale);
+        innerRef.current.style.width = `${DESIGN_WIDTH}px`;
+        innerRef.current.style.height = `${window.innerHeight / scale}px`;
+      } else {
+        // Desktop: fill full viewport — no zoom, no fixed width
+        innerRef.current.style.zoom = '1';
+        innerRef.current.style.width = '100%';
+        innerRef.current.style.height = '100dvh';
+      }
     };
     applyScale();
     window.addEventListener('resize', applyScale);
@@ -279,7 +287,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="app-shell-wrapper">
-      <div ref={innerRef} className="app-shell-inner flex overflow-hidden bg-background">
+      <div ref={innerRef} className="app-shell-inner flex h-screen overflow-hidden bg-background">
       {/* Sidebar */}
       <aside className="w-52 flex flex-col border-r bg-white dark:bg-sidebar shrink-0">
          <div className="flex items-center p-4 h-14">
@@ -506,7 +514,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-auto bg-white dark:bg-background">
+        <main className="flex-1 min-h-0 w-full overflow-y-auto overflow-x-hidden bg-white dark:bg-background">
           {children}
         </main>
       </div>

@@ -3,27 +3,39 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { mockCustomers, Customer } from '@/lib/mock-data';
 import { Search, Filter, ChevronRight, Download, MoreHorizontal, ArrowUpDown } from 'lucide-react';
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
+  Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle,
 } from "@/components/ui/sheet";
 import { Skeleton } from '@/components/ui/skeleton';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
+
+// ─── Generate a consistent color from a name string ───────────
+function nameToHsl(name: string): { bg: string; text: string; border: string } {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    hash |= 0;
+  }
+  const hue = Math.abs(hash) % 360;
+  return {
+    bg:     `hsl(${hue}, 70%, 88%)`,
+    text:   `hsl(${hue}, 55%, 30%)`,
+    border: `hsl(${hue}, 60%, 75%)`,
+  };
+}
+
+// Stat card palettes
+const STAT_COLORS = [
+  { bg: 'bg-violet-50 dark:bg-violet-950/30', border: 'border-violet-200 dark:border-violet-800', label: 'text-violet-600 dark:text-violet-400', value: 'text-violet-900 dark:text-violet-200' },
+  { bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200 dark:border-emerald-800', label: 'text-emerald-600 dark:text-emerald-400', value: 'text-emerald-900 dark:text-emerald-200' },
+];
 
 export default function Customers() {
   const [search, setSearch] = useState('');
@@ -129,9 +141,17 @@ export default function Customers() {
                   >
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8 border">
-                          <AvatarFallback className="bg-secondary text-xs">{customer.avatar}</AvatarFallback>
-                        </Avatar>
+                        {(() => {
+                          const clr = nameToHsl(customer.name);
+                          return (
+                            <div
+                              className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 border"
+                              style={{ backgroundColor: clr.bg, color: clr.text, borderColor: clr.border }}
+                            >
+                              {customer.avatar}
+                            </div>
+                          );
+                        })()}
                         <div>
                           <div className="font-medium text-sm">{customer.name}</div>
                           <div className="text-xs text-muted-foreground">{customer.email}</div>
@@ -139,11 +159,11 @@ export default function Customers() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className={
-                        customer.status === 'active' ? 'bg-secondary/50 text-foreground border-border' :
-                        customer.status === 'inactive' ? 'bg-transparent text-muted-foreground border-dashed' :
-                        'bg-muted text-muted-foreground line-through'
-                      }>
+                      <Badge variant="outline" className={`text-[10px] h-5 w-16 justify-center px-0 font-medium ${
+                        customer.status === 'active'   ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800' :
+                        customer.status === 'inactive' ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800' :
+                                                         'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800'
+                      }`}>
                         {customer.status}
                       </Badge>
                     </TableCell>
@@ -179,33 +199,47 @@ export default function Customers() {
               <div className="p-6 border-b bg-card">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-4">
-                    <Avatar className="h-16 w-16 border-2 border-border shadow-sm">
-                      <AvatarFallback className="text-lg bg-secondary">{selectedCustomer.avatar}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <h2 className="text-xl font-bold">{selectedCustomer.name}</h2>
+                    {(() => {
+                      const clr = nameToHsl(selectedCustomer.name);
+                      return (
+                        <div
+                          className="h-16 w-16 rounded-full flex items-center justify-center text-xl font-bold shrink-0 border-2"
+                          style={{ backgroundColor: clr.bg, color: clr.text, borderColor: clr.border }}
+                        >
+                          {selectedCustomer.avatar}
+                        </div>
+                      );
+                    })()}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-xl font-bold">{selectedCustomer.name}</h2>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 ml-1">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </div>
                       <p className="text-sm text-muted-foreground">{selectedCustomer.email}</p>
                       <div className="flex items-center gap-2 mt-2">
-                        <Badge variant="outline" className="bg-secondary/50">{selectedCustomer.status}</Badge>
+                        <Badge variant="outline" className={`text-[10px] h-5 w-16 justify-center px-0 font-medium ${
+                          selectedCustomer.status === 'active'   ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800' :
+                          selectedCustomer.status === 'inactive' ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800' :
+                                                                   'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800'
+                        }`}>{selectedCustomer.status}</Badge>
                         <span className="text-xs text-muted-foreground">{selectedCustomer.id}</span>
                       </div>
                     </div>
                   </div>
-                  <Button variant="ghost" size="icon">
-                    <MoreHorizontal className="w-4 h-4" />
-                  </Button>
                 </div>
               </div>
               
               <div className="flex-1 overflow-y-auto p-6 space-y-8">
                 <div className="grid grid-cols-2 gap-4">
-                  <Card className="p-4 bg-secondary/20 border-border/50">
-                    <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">Lifetime Value</div>
-                    <div className="text-2xl font-bold">${selectedCustomer.totalSpend.toLocaleString()}</div>
+                  <Card className={`p-4 border ${STAT_COLORS[0].bg} ${STAT_COLORS[0].border}`}>
+                    <div className={`text-xs uppercase tracking-wider font-semibold mb-1 ${STAT_COLORS[0].label}`}>Lifetime Value</div>
+                    <div className={`text-2xl font-bold ${STAT_COLORS[0].value}`}>${selectedCustomer.totalSpend.toLocaleString()}</div>
                   </Card>
-                  <Card className="p-4 bg-secondary/20 border-border/50">
-                    <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">Total Orders</div>
-                    <div className="text-2xl font-bold">{selectedCustomer.totalOrders}</div>
+                  <Card className={`p-4 border ${STAT_COLORS[1].bg} ${STAT_COLORS[1].border}`}>
+                    <div className={`text-xs uppercase tracking-wider font-semibold mb-1 ${STAT_COLORS[1].label}`}>Total Orders</div>
+                    <div className={`text-2xl font-bold ${STAT_COLORS[1].value}`}>{selectedCustomer.totalOrders}</div>
                   </Card>
                 </div>
 

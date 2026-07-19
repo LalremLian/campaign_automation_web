@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, Legend } from 'recharts';
 import { ArrowUpRight, ArrowDownRight, TrendingUp, Info } from 'lucide-react';
+
+const YOU_COLOR     = '#6366f1'; // indigo
+const AVG_COLOR     = '#f97316'; // orange
+const BAR_COLORS    = ['#6366f1', '#8b5cf6', '#ec4899', '#f97316', '#22c55e', '#14b8a6'];
 
 const industries = ['E-commerce', 'SaaS', 'Agency', 'Healthcare', 'Finance', 'Education'];
 
@@ -97,15 +101,19 @@ export default function Benchmarks() {
                 <RadarChart data={radarData}>
                   <PolarGrid stroke="hsl(var(--border))" />
                   <PolarAngleAxis dataKey="subject" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} />
-                  <Radar name="You" dataKey="you" stroke="hsl(var(--foreground))" fill="hsl(var(--foreground))" fillOpacity={0.15} strokeWidth={2} />
-                  <Radar name="Industry" dataKey="avg" stroke="hsl(var(--chart-3))" fill="hsl(var(--chart-3))" fillOpacity={0.1} strokeWidth={1.5} strokeDasharray="4 2" />
+                  <Radar name="You" dataKey="you" stroke={YOU_COLOR} fill={YOU_COLOR} fillOpacity={0.25} strokeWidth={2.5} dot={{ r: 3, fill: YOU_COLOR }} />
+                  <Radar name="Industry" dataKey="avg" stroke={AVG_COLOR} fill={AVG_COLOR} fillOpacity={0.12} strokeWidth={2} strokeDasharray="4 2" />
                   <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [`${v}`, '']} />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
             <div className="flex items-center justify-center gap-6 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1.5"><span className="w-3 h-0.5 bg-foreground inline-block" /> You</div>
-              <div className="flex items-center gap-1.5"><span className="w-3 h-0.5 bg-chart-3 inline-block" style={{backgroundColor:'hsl(var(--chart-3))'}} /> {industry} Avg</div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-0.5 inline-block rounded-full" style={{ backgroundColor: YOU_COLOR }} /> You
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-0.5 inline-block rounded-full" style={{ backgroundColor: AVG_COLOR }} /> {industry} Avg
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -119,15 +127,35 @@ export default function Benchmarks() {
           <CardContent>
             <div className="h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data.map(d => ({ name: d.metric, You: d.yours, Average: d.industry }))} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
+                <BarChart data={data.map((d, i) => ({ name: d.metric, You: d.yours, Average: d.industry, color: BAR_COLORS[i % BAR_COLORS.length] }))} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
+                  <defs>
+                    {BAR_COLORS.map((color, i) => (
+                      <linearGradient key={i} id={`bmGrad${i}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={color} stopOpacity={1} />
+                        <stop offset="100%" stopColor={color} stopOpacity={0.6} />
+                      </linearGradient>
+                    ))}
+                  </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                   <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
                   <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
                   <Tooltip contentStyle={tooltipStyle} />
-                  <Bar dataKey="You" fill="hsl(var(--foreground))" radius={[3,3,0,0]} maxBarSize={24} />
-                  <Bar dataKey="Average" fill="hsl(var(--chart-4))" radius={[3,3,0,0]} maxBarSize={24} />
+                  <Bar dataKey="You" radius={[3,3,0,0]} maxBarSize={24}>
+                    {data.map((_, i) => (
+                      <Cell key={i} fill={`url(#bmGrad${i % BAR_COLORS.length})`} />
+                    ))}
+                  </Bar>
+                  <Bar dataKey="Average" fill="#e2e8f0" radius={[3,3,0,0]} maxBarSize={24} />
                 </BarChart>
               </ResponsiveContainer>
+            </div>
+            <div className="flex items-center gap-6 mt-2 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-sm inline-block" style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }} /> You
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-sm inline-block bg-slate-200" /> {industry} Avg
+              </div>
             </div>
           </CardContent>
         </Card>

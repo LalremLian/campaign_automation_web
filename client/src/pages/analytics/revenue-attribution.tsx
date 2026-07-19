@@ -40,7 +40,14 @@ const pieData = [
   { name: 'Campaigns', value: 37 },
   { name: 'Forms', value: 11 },
 ];
-const PIE_COLORS = ['hsl(var(--foreground))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))'];
+const PIE_COLORS = ['#6366f1', '#f97316', '#22c55e'];
+
+// Colors for stacked bar segments
+const BAR_SOURCE_COLORS = {
+  flows:     '#6366f1',
+  campaigns: '#f97316',
+  forms:     '#22c55e',
+};
 
 const tooltipStyle = { backgroundColor: 'hsl(var(--card))', borderRadius: '6px', border: '1px solid hsl(var(--border))', fontSize: 12 };
 
@@ -105,16 +112,20 @@ export default function RevenueAttribution() {
                   <XAxis dataKey="name" tickLine={false} axisLine={false} stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 11 }} />
                   <YAxis tickLine={false} axisLine={false} stroke="hsl(var(--muted-foreground))" tick={{ fontSize: 11 }} tickFormatter={v => `$${v/1000}k`} />
                   <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [`$${v.toLocaleString()}`, '']} />
-                  <Bar dataKey="flows" name="Flows" stackId="a" fill="hsl(var(--foreground))" radius={[0,0,0,0]} maxBarSize={36} />
-                  <Bar dataKey="campaigns" name="Campaigns" stackId="a" fill="hsl(var(--chart-3))" maxBarSize={36} />
-                  <Bar dataKey="forms" name="Forms" stackId="a" fill="hsl(var(--chart-4))" radius={[4,4,0,0]} maxBarSize={36} />
+                  <Bar dataKey="flows" name="Flows" stackId="a" fill={BAR_SOURCE_COLORS.flows} radius={[0,0,0,0]} maxBarSize={36} />
+                  <Bar dataKey="campaigns" name="Campaigns" stackId="a" fill={BAR_SOURCE_COLORS.campaigns} maxBarSize={36} />
+                  <Bar dataKey="forms" name="Forms" stackId="a" fill={BAR_SOURCE_COLORS.forms} radius={[4,4,0,0]} maxBarSize={36} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
             <div className="flex items-center gap-5 mt-3">
-              {[{color:'hsl(var(--foreground))',label:'Flows'},{color:'hsl(var(--chart-3))',label:'Campaigns'},{color:'hsl(var(--chart-4))',label:'Forms'}].map(l=>(
+              {[
+                { color: BAR_SOURCE_COLORS.flows,     label: 'Flows' },
+                { color: BAR_SOURCE_COLORS.campaigns, label: 'Campaigns' },
+                { color: BAR_SOURCE_COLORS.forms,     label: 'Forms' },
+              ].map(l => (
                 <div key={l.label} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{backgroundColor:l.color}} />
+                  <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ backgroundColor: l.color }} />
                   {l.label}
                 </div>
               ))}
@@ -128,11 +139,28 @@ export default function RevenueAttribution() {
             <CardDescription className="text-xs">Breakdown by source type</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[180px]">
+            <div className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value">
-                    {pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i]} />)}
+                  <defs>
+                    {PIE_COLORS.map((color, i) => (
+                      <linearGradient key={i} id={`pieGrad${i}`} x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor={color} stopOpacity={1} />
+                        <stop offset="100%" stopColor={color} stopOpacity={0.7} />
+                      </linearGradient>
+                    ))}
+                  </defs>
+                  <Pie
+                    data={pieData}
+                    cx="50%" cy="50%"
+                    innerRadius={55} outerRadius={85}
+                    paddingAngle={3}
+                    dataKey="value"
+                    strokeWidth={0}
+                  >
+                    {pieData.map((_, i) => (
+                      <Cell key={i} fill={`url(#pieGrad${i})`} />
+                    ))}
                   </Pie>
                   <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [`${v}%`, '']} />
                 </PieChart>
@@ -142,7 +170,7 @@ export default function RevenueAttribution() {
               {pieData.map((d, i) => (
                 <div key={d.name} className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-sm" style={{ backgroundColor: PIE_COLORS[i] }} />
+                    <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: PIE_COLORS[i] }} />
                     <span className="text-muted-foreground">{d.name}</span>
                   </div>
                   <span className="font-semibold">{d.value}%</span>
