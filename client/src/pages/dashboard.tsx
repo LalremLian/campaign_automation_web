@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -6,11 +7,181 @@ import { Badge } from '@/components/ui/badge';
 import {
   ArrowUpRight, ArrowUp, Wand2, X, Calendar,
   ChevronDown, TrendingUp, Mail, Zap, Users,
-  Megaphone, BarChart2, ArrowRight, Sparkles,
+  Megaphone, BarChart2, ArrowRight, Sparkles, Check,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { useLocation } from 'wouter';
+
+// ─── Plan Recommendations Modal ───────────────────────────────────────────────
+
+const plans = [
+  {
+    id: 'email-sms',
+    name: 'Email + mobile messages',
+    badge: 'Recommended',
+    badgeColor: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
+    price: '$35',
+    desc: 'Take your marketing further by reaching customers through both email and mobile messaging.',
+    highlight: true,
+    features: [
+      { text: '500 active profiles', ok: true },
+      { text: '5,000 monthly email sends', ok: true },
+      { text: '1,250 mobile messaging credits per month', ok: true },
+      { text: '350+ built-in integrations', ok: true },
+      { text: 'Built-in reporting dashboards', ok: true },
+      { text: 'Email support', ok: true },
+      { text: 'Generative AI to create content fast', ok: true },
+      { text: 'Klaviyo logo removed from emails', ok: true },
+      { text: 'Predictive analytics', ok: true },
+      { text: 'Multi-channel segmentation', ok: true },
+      { text: 'Multi-channel attribution', ok: true },
+    ],
+    cta: 'Select Plan',
+    ctaVariant: 'default' as const,
+  },
+  {
+    id: 'email',
+    name: 'Email',
+    badge: null,
+    badgeColor: '',
+    price: '$20',
+    desc: 'Grow faster with smarter email marketing that personalises at scale.',
+    highlight: false,
+    features: [
+      { text: '500 active profiles', ok: true },
+      { text: '5,000 monthly email sends', ok: true },
+      { text: '417 mobile messaging credits per month', ok: true },
+      { text: '350+ built-in integrations', ok: true },
+      { text: 'Built-in reporting dashboards', ok: true },
+      { text: 'Email support', ok: true },
+      { text: 'Generative AI to create content fast', ok: true },
+      { text: 'Klaviyo logo removed from emails', ok: true },
+      { text: 'Predictive analytics', ok: true },
+      { text: 'Multi-channel segmentation', ok: false },
+      { text: 'Multi-channel attribution', ok: false },
+    ],
+    cta: 'Select Plan',
+    ctaVariant: 'default' as const,
+  },
+  {
+    id: 'free',
+    name: 'Free',
+    badge: 'Current plan',
+    badgeColor: 'bg-secondary text-muted-foreground',
+    price: '$0',
+    desc: 'Perfect for getting started and trying out the MarketFlow platform.',
+    highlight: false,
+    features: [
+      { text: '250 active profiles', ok: true },
+      { text: '500 monthly email sends', ok: true },
+      { text: '417 mobile messaging credits per month', ok: true },
+      { text: '350+ built-in integrations', ok: true },
+      { text: 'Built-in reporting dashboards', ok: true },
+      { text: 'Email support (first 60 days)', ok: true },
+      { text: 'Generative AI to create content fast', ok: true },
+      { text: 'Klaviyo logo removed from emails', ok: false },
+      { text: 'Predictive analytics', ok: false },
+      { text: 'Multi-channel segmentation', ok: false },
+      { text: 'Multi-channel attribution', ok: false },
+    ],
+    cta: 'Keep my current free plan',
+    ctaVariant: 'outline' as const,
+  },
+];
+
+function PlanRecommendationsModal({ onClose }: { onClose: () => void }) {
+  return createPortal(
+    <AnimatePresence>
+      <motion.div
+        className="fixed inset-0 z-[9999] flex items-start justify-center bg-black/50 backdrop-blur-sm overflow-y-auto py-8"
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      >
+        <motion.div
+          className="relative bg-background rounded-xl border border-border shadow-2xl w-full max-w-4xl mx-4"
+          initial={{ opacity: 0, scale: 0.96, y: 16 }} animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.96, y: 16 }} transition={{ duration: 0.2 }}
+        >
+          {/* Header bar */}
+          <div className="flex items-center justify-between px-5 py-3 border-b border-border/60">
+            <p className="text-xs font-medium text-muted-foreground">Plan recommendations</p>
+            <button onClick={onClose}
+              className="px-3 py-1 text-xs font-medium border border-border rounded-md hover:bg-secondary transition-colors">
+              Exit
+            </button>
+          </div>
+
+          {/* Title */}
+          <div className="text-center pt-8 pb-6 px-6">
+            <h2 className="text-xl font-bold tracking-tight mb-1.5">Compare plans for your business</h2>
+            <p className="text-sm text-muted-foreground">Here are some suggested plans, curated to fit your brand's needs.</p>
+          </div>
+
+          {/* Plan cards */}
+          <div className="grid grid-cols-3 gap-4 px-6 pb-4">
+            {plans.map((plan) => (
+              <div key={plan.id}
+                className={`rounded-xl border p-5 flex flex-col ${plan.highlight ? 'border-border shadow-md' : 'border-border/60'}`}>
+                {/* Plan name + badge */}
+                <div className="flex items-center gap-2 mb-3 flex-wrap">
+                  <span className="text-sm font-semibold">{plan.name}</span>
+                  {plan.badge && (
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${plan.badgeColor}`}>
+                      {plan.badge}
+                    </span>
+                  )}
+                </div>
+
+                {/* Price */}
+                <div className="mb-3">
+                  <p className="text-[10px] text-muted-foreground">Starting at</p>
+                  <div className="flex items-end gap-0.5">
+                    <span className="text-4xl font-bold tracking-tight">{plan.price}</span>
+                    <span className="text-sm text-muted-foreground mb-1.5">/ month</span>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <p className="text-xs text-muted-foreground leading-relaxed mb-4">{plan.desc}</p>
+
+                {/* Features */}
+                <div className="mb-5">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">Includes:</p>
+                  <ul className="space-y-1.5">
+                    {plan.features.map((f) => (
+                      <li key={f.text} className="flex items-start gap-2 text-[11px]">
+                        <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${f.ok ? 'bg-emerald-500' : 'bg-red-400'}`}>
+                          {f.ok
+                            ? <Check className="w-2 h-2 text-white" />
+                            : <X className="w-2 h-2 text-white" />}
+                        </div>
+                        <span className={f.ok ? 'text-foreground' : 'text-muted-foreground'}>{f.text}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* CTA */}
+                <Button variant={plan.ctaVariant} className="w-full mt-auto text-xs h-9" onClick={onClose}>
+                  {plan.cta}
+                </Button>
+              </div>
+            ))}
+          </div>
+
+          {/* Skip */}
+          <div className="text-center py-5 border-t border-border/60">
+            <button onClick={onClose} className="text-sm text-muted-foreground hover:text-foreground transition-colors px-4 py-1.5 rounded-md hover:bg-secondary">
+              Skip for now
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>,
+    document.body
+  );
+}
 
 const revenueData = [
   { day: 'Mon', rev: 4200 }, { day: 'Tue', rev: 5800 }, { day: 'Wed', rev: 4900 },
@@ -45,10 +216,15 @@ function QuickSuggestion({ text }: { text: string }) {
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [showPromo, setShowPromo] = useState(true);
+  const [showPlans, setShowPlans] = useState(false);
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    const t = setTimeout(() => setLoading(false), 600);
+    const t = setTimeout(() => {
+      setLoading(false);
+      // Always show plan modal after login
+      setShowPlans(true);
+    }, 600);
     return () => clearTimeout(t);
   }, []);
 
@@ -73,6 +249,9 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-[920px] mx-auto py-10 px-4 sm:px-6 space-y-8">
+
+      {/* ── Plan Recommendations Modal ── */}
+      {showPlans && <PlanRecommendationsModal onClose={() => setShowPlans(false)} />}
 
       {/* ── Greeting + AI composer ── */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
