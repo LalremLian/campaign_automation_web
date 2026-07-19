@@ -89,9 +89,9 @@ export default function MediaBrand() {
           <div className="flex items-center gap-3">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-              <Input className="pl-8 h-8 text-xs bg-background w-56" placeholder="Search files..." value={search} onChange={e => setSearch(e.target.value)} />
+              <Input className="pl-8 h-8 text-xs bg-background w-110" placeholder="Search files..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
-            <div className="text-xs text-muted-foreground ml-auto">{filteredMedia.length} files · 1.2 GB used of 5 GB</div>
+            <div className="text-xs text-muted-foreground ml-auto"><span className="font-bold text-foreground">{filteredMedia.length} files · 1.2 GB used of 5 GB</span></div>
           </div>
 
           {/* Upload dropzone */}

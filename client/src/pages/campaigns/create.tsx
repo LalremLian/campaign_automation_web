@@ -94,27 +94,27 @@ function StepChannel({ value, onChange }: { value: Channel | null; onChange: (c:
   return (
     <div className="space-y-3">
       <p className="text-xs text-muted-foreground">Choose the channel you want to send this campaign through.</p>
-      <div className="grid grid-cols-3 gap-3 mt-4">
+      <div className="flex flex-col gap-3 mt-4 max-w-lg">
         {options.map(({ channel, icon: Icon, desc }) => (
           <button
             key={channel}
             onClick={() => onChange(channel)}
             className={cn(
-              'flex flex-col items-start gap-3 rounded-lg border-2 p-5 text-left transition-all',
+              'flex items-center gap-4 rounded-lg border-2 p-4 text-left transition-all',
               value === channel
                 ? 'border-foreground bg-secondary/30'
                 : 'border-border hover:border-foreground/40'
             )}
           >
-            <div className="p-2 rounded-md bg-secondary">
+            <div className="p-2 rounded-md bg-secondary shrink-0">
               <Icon className="w-5 h-5" />
             </div>
-            <div>
+            <div className="flex-1">
               <p className="font-semibold text-sm">{channel}</p>
               <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
             </div>
             {value === channel && (
-              <div className="ml-auto -mt-1 w-5 h-5 rounded-full bg-foreground flex items-center justify-center">
+              <div className="w-5 h-5 rounded-full bg-foreground flex items-center justify-center shrink-0">
                 <Check className="w-3 h-3 text-background" />
               </div>
             )}
@@ -230,29 +230,68 @@ function StepContent({
 
       {/* Right — preview */}
       <div className="space-y-2">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Preview</p>
+        <div className="flex items-center gap-2">
+          <p className="text-xs font-semibold uppercase tracking-wider">Live Preview</p>
+          <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 font-medium">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />live
+          </span>
+        </div>
         {isEmail ? (
-          <div className="border rounded-lg overflow-hidden bg-background text-xs">
-            <div className="bg-secondary/40 px-4 py-2.5 border-b space-y-0.5">
-              <p className="text-[10px] text-muted-foreground">From: Campaign &lt;hello@campaign.app&gt;</p>
-              <p className="font-medium text-sm">{state.subject || 'Your subject line…'}</p>
-              <p className="text-[10px] text-muted-foreground">{state.previewText || 'Preview text appears here…'}</p>
+          <div className="rounded-xl overflow-hidden border border-border shadow-md bg-background text-xs">
+            {/* Inbox chrome bar */}
+            <div className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/40 dark:to-indigo-900/40 px-4 py-3">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-7 h-7 rounded-full bg-blue-200 dark:bg-blue-800 flex items-center justify-center text-blue-700 dark:text-blue-200 text-[10px] font-bold shrink-0">C</div>
+                <div>
+                  <p className="text-[10px] text-blue-500 dark:text-blue-400">Campaign &lt;hello@campaign.app&gt;</p>
+                  <p className="text-blue-900 dark:text-blue-100 font-semibold text-sm leading-tight">{state.subject || <span className="opacity-40">Your subject line…</span>}</p>
+                </div>
+              </div>
+              <p className="text-[10px] text-blue-400 dark:text-blue-500">{state.previewText || 'Preview text appears here…'}</p>
             </div>
-            <div className="p-4 min-h-[180px] text-muted-foreground whitespace-pre-wrap text-xs leading-relaxed">
-              {state.body || 'Your message body will appear here…'}
+            {/* Body */}
+            <div className="p-5 min-h-[160px] leading-relaxed text-foreground whitespace-pre-wrap bg-white dark:bg-card">
+              {state.body
+                ? <span className="text-sm">{state.body}</span>
+                : <span className="text-muted-foreground text-sm italic">Your message body will appear here…</span>}
+            </div>
+            {/* Footer */}
+            <div className="px-5 py-3 bg-gray-50 dark:bg-secondary/30 border-t border-border">
+              <p className="text-[10px] text-muted-foreground text-center">Unsubscribe · View in browser · Privacy Policy</p>
             </div>
           </div>
         ) : (
-          <div className="flex justify-center pt-4">
-            <div className="w-52 border-4 border-foreground/10 rounded-3xl p-3 bg-background shadow-lg">
-              <div className="bg-secondary/50 rounded-2xl p-3 space-y-2">
-                <p className="text-[10px] text-muted-foreground font-medium">
-                  {channel === 'WhatsApp' ? 'WhatsApp · Campaign' : 'Campaign'}
-                </p>
-                <div className="bg-background rounded-xl p-2.5 text-xs leading-relaxed shadow-sm">
-                  {state.body || 'Your message will appear here…'}
+          <div className="flex justify-center pt-2">
+            {/* Phone frame */}
+            <div className="relative w-56">
+              <div className="w-56 border-[6px] border-gray-800 dark:border-gray-600 rounded-[2.5rem] p-2 bg-gray-800 dark:bg-gray-600 shadow-2xl">
+                {/* Screen */}
+                <div className={`rounded-[2rem] overflow-hidden ${channel === 'WhatsApp' ? 'bg-[#e5ddd5] dark:bg-[#0d1117]' : 'bg-gradient-to-b from-gray-100 to-white dark:from-gray-800 dark:to-gray-900'}`}>
+                  {/* Status bar */}
+                  <div className={`px-4 pt-2 pb-1 flex items-center justify-between ${channel === 'WhatsApp' ? 'bg-[#075e54]' : 'bg-blue-100 dark:bg-blue-900/50'}`}>
+                    <span className={`text-[9px] font-medium ${channel === 'WhatsApp' ? 'text-white' : 'text-blue-700 dark:text-blue-200'}`}>9:41</span>
+                    <span className={`text-[9px] ${channel === 'WhatsApp' ? 'text-white' : 'text-blue-700 dark:text-blue-200'}`}>{channel === 'WhatsApp' ? 'WhatsApp' : 'Messages'}</span>
+                    <span className={`text-[9px] ${channel === 'WhatsApp' ? 'text-white' : 'text-blue-700 dark:text-blue-200'}`}>●●●</span>
+                  </div>
+                  {/* Chat area */}
+                  <div className="p-3 min-h-[160px] space-y-2">
+                    <div className="flex justify-start">
+                      <div className={`max-w-[85%] rounded-xl rounded-tl-sm px-3 py-2 shadow-sm ${channel === 'WhatsApp' ? 'bg-white dark:bg-gray-700' : 'bg-white dark:bg-gray-700 border border-border'}`}>
+                        <p className="text-xs leading-relaxed text-foreground">
+                          {state.body || <span className="text-muted-foreground italic">Your message will appear here…</span>}
+                        </p>
+                        <p className="text-[9px] text-muted-foreground text-right mt-1">
+                          {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {channel === 'WhatsApp' && ' ✓✓'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-[9px] text-muted-foreground text-right">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+              </div>
+              {/* Home indicator */}
+              <div className="flex justify-center mt-2">
+                <div className="w-16 h-1 bg-gray-600 dark:bg-gray-400 rounded-full" />
               </div>
             </div>
           </div>
@@ -351,7 +390,7 @@ function StepAudience({
                 <p className="text-[11px] text-muted-foreground mt-0.5">{desc}</p>
               </div>
               {state.sendTime === id && (
-                <Check className="w-3.5 h-3.5 ml-auto mt-1 shrink-0" />
+                <Check className="w-3.5 h-3.5 ml-auto self-center shrink-0" />
               )}
             </button>
           ))}
@@ -360,21 +399,21 @@ function StepAudience({
         {state.sendTime === 'schedule' && (
           <div className="grid grid-cols-2 gap-2 pt-1">
             <div className="space-y-1">
-              <Label className="text-[10px]">Date</Label>
+              <Label className="text-xs font-medium">Date</Label>
               <Input
                 type="date"
                 value={state.scheduledDate}
                 onChange={e => onChange({ scheduledDate: e.target.value })}
-                className="h-7 text-xs"
+                className="h-8 text-sm"
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-[10px]">Time</Label>
+              <Label className="text-xs font-medium">Time</Label>
               <Input
                 type="time"
                 value={state.scheduledHour}
                 onChange={e => onChange({ scheduledHour: e.target.value })}
-                className="h-7 text-xs"
+                className="h-8 text-sm"
               />
             </div>
           </div>

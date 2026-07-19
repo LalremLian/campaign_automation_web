@@ -106,15 +106,15 @@ export default function UniversalContent() {
       {/* Stats row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Total Blocks', value: blocks.length.toString() },
-          { label: 'Headers', value: blocks.filter(b => b.type === 'header').length.toString() },
-          { label: 'Footers', value: blocks.filter(b => b.type === 'footer').length.toString() },
-          { label: 'Most Used', value: 'Primary CTA' },
-        ].map(({ label, value }) => (
-          <Card key={label} className="border-border/60">
+          { label: 'Total Blocks', value: blocks.length.toString(),                               bg: 'bg-blue-50 dark:bg-blue-950/30',   border: 'border-blue-200 dark:border-blue-800',   labelCls: 'text-blue-600 dark:text-blue-400',   valueCls: 'text-blue-900 dark:text-blue-200'   },
+          { label: 'Headers',      value: blocks.filter(b => b.type === 'header').length.toString(), bg: 'bg-violet-50 dark:bg-violet-950/30', border: 'border-violet-200 dark:border-violet-800', labelCls: 'text-violet-600 dark:text-violet-400', valueCls: 'text-violet-900 dark:text-violet-200' },
+          { label: 'Footers',      value: blocks.filter(b => b.type === 'footer').length.toString(), bg: 'bg-amber-50 dark:bg-amber-950/30',  border: 'border-amber-200 dark:border-amber-800',  labelCls: 'text-amber-600 dark:text-amber-400',  valueCls: 'text-amber-900 dark:text-amber-200'  },
+          { label: 'Most Used',    value: 'Primary CTA',                                          bg: 'bg-card',                             border: 'border-border/60',                          labelCls: 'text-muted-foreground',                  valueCls: 'text-foreground'                        },
+        ].map(({ label, value, bg, border, labelCls, valueCls }) => (
+          <Card key={label} className={`border ${bg} ${border}`}>
             <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground">{label}</p>
-              <p className="text-lg font-bold mt-1">{value}</p>
+              <p className={`text-xs font-medium ${labelCls}`}>{label}</p>
+              <p className={`text-lg font-bold mt-1 ${valueCls}`}>{value}</p>
             </CardContent>
           </Card>
         ))}

@@ -153,13 +153,17 @@ export default function ConsentCompliance() {
           <CardHeader className="pb-2"><CardTitle className="text-sm font-semibold">Compliance Checklist</CardTitle><CardDescription className="text-xs">Required steps to stay compliant across regulations</CardDescription></CardHeader>
           <CardContent className="space-y-2 pt-2">
             {checklist.map(({ item, done }) => (
-              <div key={item} className={`flex items-center gap-3 p-3 rounded-lg border ${done ? 'border-border/60 bg-card' : 'border-amber-200 bg-amber-50/40 dark:border-amber-900 dark:bg-amber-950/10'}`}>
+              <div key={item} className={`flex items-center gap-3 p-3 rounded-lg border ${done ? 'border-border/60 bg-card' : 'border-red-200 bg-red-50/50 dark:border-red-900 dark:bg-red-950/20'}`}>
                 {done
                   ? <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  : <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+                  : <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
                 }
-                <p className="text-sm flex-1">{item}</p>
-                {!done && <Button variant="outline" size="sm" className="text-xs h-7 shrink-0">Fix Now</Button>}
+                <p className={`text-sm flex-1 ${!done ? 'text-red-800 dark:text-red-300 font-medium' : ''}`}>{item}</p>
+                {!done && (
+                  <Button size="sm" className="text-xs h-7 shrink-0 bg-red-600 hover:bg-red-700 text-white border-0 rounded-lg">
+                    Fix Now
+                  </Button>
+                )}
               </div>
             ))}
           </CardContent>

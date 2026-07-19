@@ -60,15 +60,15 @@ export default function AuditLog() {
       {/* KPIs */}
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         {[
-          { label: 'Events Today', value: '48', sub: '+12 vs yesterday' },
-          { label: 'Critical Events', value: '1', sub: 'Last 24 hours' },
-          { label: 'Active Users', value: '3', sub: 'In last 7 days' },
-          { label: 'API Calls', value: '1,240', sub: 'Last 30 days' },
-        ].map(({ label, value, sub }) => (
-          <Card key={label} className="border-border/60">
+          { label: 'Events Today',    value: '48',    sub: '+12 vs yesterday', bg: 'bg-blue-50 dark:bg-blue-950/30',    border: 'border-blue-200 dark:border-blue-800',    lCls: 'text-blue-600 dark:text-blue-400',    vCls: 'text-blue-900 dark:text-blue-200'    },
+          { label: 'Critical Events', value: '1',     sub: 'Last 24 hours',   bg: 'bg-rose-50 dark:bg-rose-950/30',    border: 'border-rose-200 dark:border-rose-800',    lCls: 'text-rose-600 dark:text-rose-400',    vCls: 'text-rose-900 dark:text-rose-200'    },
+          { label: 'Active Users',    value: '3',     sub: 'In last 7 days',  bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200 dark:border-emerald-800', lCls: 'text-emerald-600 dark:text-emerald-400', vCls: 'text-emerald-900 dark:text-emerald-200' },
+          { label: 'API Calls',       value: '1,240', sub: 'Last 30 days',    bg: 'bg-violet-50 dark:bg-violet-950/30', border: 'border-violet-200 dark:border-violet-800', lCls: 'text-violet-600 dark:text-violet-400', vCls: 'text-violet-900 dark:text-violet-200' },
+        ].map(({ label, value, sub, bg, border, lCls, vCls }) => (
+          <Card key={label} className={`border ${bg} ${border}`}>
             <CardContent className="p-5">
-              <p className="text-xs text-muted-foreground mb-2">{label}</p>
-              <p className="text-2xl font-bold">{value}</p>
+              <p className={`text-xs font-medium mb-2 ${lCls}`}>{label}</p>
+              <p className={`text-2xl font-bold ${vCls}`}>{value}</p>
               <p className="text-xs text-muted-foreground mt-1">{sub}</p>
             </CardContent>
           </Card>
