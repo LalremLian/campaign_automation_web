@@ -9,7 +9,6 @@ import {
   X, CheckCircle2, AlertCircle, Info, Mail,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -95,9 +94,40 @@ function NotificationsPanel({ onClose }: { onClose: () => void }) {
   );
 }
 
+// ─── Search data ──────────────────────────────────────────────
+const ALL_PAGES = [
+  { label: 'Home',                 path: '/home',                          group: 'Main' },
+  { label: 'Get Started',          path: '/get-started',                   group: 'Main' },
+  { label: 'Campaigns',            path: '/campaigns',                     group: 'Main' },
+  { label: 'Create Campaign',      path: '/campaigns/create',              group: 'Main' },
+  { label: 'Automations',          path: '/automations',                   group: 'Main' },
+  { label: 'AI Image',             path: '/flows/ai-image',                group: 'Flows' },
+  { label: 'AI Video',             path: '/flows/ai-video',                group: 'Flows' },
+  { label: 'AI Calls',             path: '/flows/ai-calls',                group: 'Flows' },
+  { label: 'Segments',             path: '/segments',                      group: 'Audience' },
+  { label: 'Audience',             path: '/customers',                     group: 'Audience' },
+  { label: 'Templates',            path: '/templates',                     group: 'Content' },
+  { label: 'Universal Content',    path: '/content/universal-content',     group: 'Content' },
+  { label: 'Media & Brand',        path: '/content/media-brand',           group: 'Content' },
+  { label: 'Analytics Overview',   path: '/analytics',                     group: 'Analytics' },
+  { label: 'Revenue Attribution',  path: '/analytics/revenue-attribution', group: 'Analytics' },
+  { label: 'Deliverability',       path: '/analytics/deliverability',      group: 'Analytics' },
+  { label: 'Benchmarks',           path: '/analytics/benchmarks',          group: 'Analytics' },
+  { label: 'A/B Tests',            path: '/analytics/ab-tests',            group: 'Analytics' },
+  { label: 'Catalog',              path: '/ecommerce/catalog',             group: 'E-commerce' },
+  { label: 'Coupons',              path: '/ecommerce/coupons',             group: 'E-commerce' },
+  { label: 'Predicted Analytics',  path: '/ecommerce/predicted-analytics', group: 'E-commerce' },
+  { label: 'Audit Log',            path: '/compliance/audit-log',          group: 'Compliance' },
+  { label: 'Consent & Compliance', path: '/compliance/consent',            group: 'Compliance' },
+  { label: 'Suppression List',     path: '/compliance/suppression-list',   group: 'Compliance' },
+  { label: 'Integrations',         path: '/integrations',                  group: 'Other' },
+  { label: 'Settings',             path: '/settings',                      group: 'Other' },
+];
+
+const SUGGESTIONS = ['Campaigns', 'Analytics Overview', 'AI Calls', 'Segments', 'Automations', 'Templates'];
+
 function SidebarItem({ icon: Icon, name, path, active, disabled, onClick }: any) {
   const [_, setLocation] = useLocation();
-  
   const handleClick = () => {
     if (disabled) return;
     if (onClick) onClick();
@@ -172,7 +202,50 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();
   const { theme, setTheme } = useTheme();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
+
+  // Filter results
+  const searchResults = searchQuery.trim()
+    ? ALL_PAGES.filter(p =>
+        p.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.group.toLowerCase().includes(searchQuery.toLowerCase())
+      ).slice(0, 8)
+    : [];
+
+  // Ctrl+K → focus inline search
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+        setTimeout(() => inputRef.current?.focus(), 10);
+      }
+      if (e.key === 'Escape') {
+        setSearchOpen(false);
+        setSearchQuery('');
+        inputRef.current?.blur();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setSearchOpen(false);
+        setSearchQuery('');
+        inputRef.current?.blur();
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   // Scale the 1280px desktop layout to fit any viewport width
   useEffect(() => {
@@ -312,17 +385,79 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <header className="h-14 border-b bg-white dark:bg-card flex items-center justify-between px-4 shrink-0 relative">
           <div className="flex-1" />
           
-          <div className="relative flex items-center justify-center flex-1 w-full max-w-[400px]">
-             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-             <Input 
-               className="w-full pl-9 pr-14 bg-gray-50/70 dark:bg-secondary/30 border-input h-[34px] rounded-md text-sm shadow-none focus-visible:ring-1 focus-visible:ring-ring" 
-               placeholder="Search" 
+          <div ref={searchRef} className="relative flex items-center justify-center flex-1 w-full max-w-[400px]">
+             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10 pointer-events-none" />
+             <input
+               ref={inputRef}
+               value={searchQuery}
+               onChange={e => { setSearchQuery(e.target.value); setSearchOpen(true); }}
+               onFocus={() => setSearchOpen(true)}
+               placeholder="Search pages…"
+               className={`w-full pl-9 pr-14 h-[34px] rounded-xl text-sm outline-none transition-all bg-gray-50/70 dark:bg-secondary/30
+                 ${searchOpen
+                   ? 'border-2 border-foreground'
+                   : 'border border-border hover:border-foreground/40'
+                 }`}
              />
              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center">
-               <kbd className="inline-flex h-[20px] items-center gap-1 rounded bg-white dark:bg-background border px-1.5 font-mono text-[10px] font-medium text-muted-foreground shadow-sm">
+               <kbd className="inline-flex h-[20px] items-center gap-1 rounded-xl bg-white dark:bg-background border px-1.5 font-mono text-[10px] font-medium text-muted-foreground shadow-sm">
                  ctrl+k
                </kbd>
              </div>
+
+             {/* Dropdown */}
+             {searchOpen && (
+               <div className="absolute top-full left-0 right-0 mt-1.5 bg-card border border-border rounded-xl shadow-xl z-50 overflow-hidden">
+                 {searchQuery.trim() === '' ? (
+                   /* Default suggestions */
+                   <div className="p-2">
+                     <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground px-2 py-1.5">Suggestions</p>
+                     {SUGGESTIONS.map(label => {
+                       const page = ALL_PAGES.find(p => p.label === label);
+                       if (!page) return null;
+                       return (
+                         <button key={page.path}
+                           onMouseDown={() => { setLocation(page.path); setSearchOpen(false); setSearchQuery(''); }}
+                           className="w-full flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-secondary transition-colors text-left">
+                           <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                           <span className="text-sm flex-1">{page.label}</span>
+                           <span className="text-[10px] text-muted-foreground">{page.group}</span>
+                         </button>
+                       );
+                     })}
+                   </div>
+                 ) : searchResults.length > 0 ? (
+                   /* Search results */
+                   <div className="p-2">
+                     <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground px-2 py-1.5">
+                       {searchResults.length} result{searchResults.length !== 1 ? 's' : ''}
+                     </p>
+                     {searchResults.map(page => (
+                       <button key={page.path}
+                         onMouseDown={() => { setLocation(page.path); setSearchOpen(false); setSearchQuery(''); }}
+                         className="w-full flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-secondary transition-colors text-left group">
+                         <div className="w-6 h-6 rounded-md bg-secondary group-hover:bg-foreground/10 flex items-center justify-center shrink-0">
+                           <Search className="w-3 h-3 text-muted-foreground" />
+                         </div>
+                         <div className="flex-1 min-w-0">
+                           <p className="text-sm font-medium truncate">{page.label}</p>
+                         </div>
+                         <span className="text-[10px] text-muted-foreground shrink-0 px-1.5 py-0.5 bg-secondary rounded-md">{page.group}</span>
+                       </button>
+                     ))}
+                   </div>
+                 ) : (
+                   /* No results */
+                   <div className="px-4 py-8 text-center">
+                     <p className="text-sm text-muted-foreground">No pages found for "<span className="font-medium text-foreground">{searchQuery}</span>"</p>
+                   </div>
+                 )}
+                 <div className="px-3 py-2 border-t border-border/60 bg-muted/20 flex items-center gap-3">
+                   <span className="text-[10px] text-muted-foreground"><kbd className="px-1 border border-border rounded text-[9px] bg-background">↵</kbd> to navigate</span>
+                   <span className="text-[10px] text-muted-foreground"><kbd className="px-1 border border-border rounded text-[9px] bg-background">esc</kbd> to close</span>
+                 </div>
+               </div>
+             )}
           </div>
           
           <div className="flex-1 flex items-center justify-end gap-1 sm:gap-2">
