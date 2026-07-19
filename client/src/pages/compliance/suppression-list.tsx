@@ -52,18 +52,18 @@ export default function SuppressionList() {
       {/* Stats */}
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         {[
-          { label: 'Total Suppressed', value: '3,842', sub: 'Across all channels', icon: UserX },
-          { label: 'Unsubscribed', value: '2,190', sub: '57% of suppressed', icon: UserX },
-          { label: 'Hard Bounced', value: '1,024', sub: '27% of suppressed', icon: AlertCircle },
-          { label: 'Spam Reports', value: '628', sub: '16% of suppressed', icon: XCircle },
-        ].map(({ label, value, sub, icon: Icon }) => (
-          <Card key={label} className="border-border/60">
+          { label: 'Total Suppressed', value: '3,842', sub: 'Across all channels', icon: UserX,      bg: 'bg-blue-50 dark:bg-blue-950/30',    border: 'border-blue-200 dark:border-blue-800',    iconBg: 'bg-blue-100 dark:bg-blue-900',    iconCls: 'text-blue-600 dark:text-blue-400',    lCls: 'text-blue-600 dark:text-blue-400',    vCls: 'text-blue-900 dark:text-blue-200'    },
+          { label: 'Unsubscribed',     value: '2,190', sub: '57% of suppressed',  icon: UserX,      bg: 'bg-amber-50 dark:bg-amber-950/30',   border: 'border-amber-200 dark:border-amber-800',  iconBg: 'bg-amber-100 dark:bg-amber-900',   iconCls: 'text-amber-600 dark:text-amber-400',   lCls: 'text-amber-600 dark:text-amber-400',   vCls: 'text-amber-900 dark:text-amber-200'   },
+          { label: 'Hard Bounced',     value: '1,024', sub: '27% of suppressed',  icon: AlertCircle, bg: 'bg-orange-50 dark:bg-orange-950/30', border: 'border-orange-200 dark:border-orange-800', iconBg: 'bg-orange-100 dark:bg-orange-900', iconCls: 'text-orange-600 dark:text-orange-400', lCls: 'text-orange-600 dark:text-orange-400', vCls: 'text-orange-900 dark:text-orange-200' },
+          { label: 'Spam Reports',     value: '628',   sub: '16% of suppressed',  icon: XCircle,    bg: 'bg-rose-50 dark:bg-rose-950/30',    border: 'border-rose-200 dark:border-rose-800',    iconBg: 'bg-rose-100 dark:bg-rose-900',    iconCls: 'text-rose-600 dark:text-rose-400',    lCls: 'text-rose-600 dark:text-rose-400',    vCls: 'text-rose-900 dark:text-rose-200'    },
+        ].map(({ label, value, sub, icon: Icon, bg, border, iconBg, iconCls, lCls, vCls }) => (
+          <Card key={label} className={`border ${bg} ${border}`}>
             <CardContent className="p-5">
               <div className="flex items-start justify-between mb-3">
-                <p className="text-xs text-muted-foreground">{label}</p>
-                <div className="w-7 h-7 rounded-md bg-secondary flex items-center justify-center"><Icon className="w-3.5 h-3.5 text-foreground" /></div>
+                <p className={`text-xs font-medium ${lCls}`}>{label}</p>
+                <div className={`w-7 h-7 rounded-md flex items-center justify-center ${iconBg}`}><Icon className={`w-3.5 h-3.5 ${iconCls}`} /></div>
               </div>
-              <p className="text-2xl font-bold">{value}</p>
+              <p className={`text-2xl font-bold ${vCls}`}>{value}</p>
               <p className="text-xs text-muted-foreground mt-1">{sub}</p>
             </CardContent>
           </Card>
@@ -71,12 +71,12 @@ export default function SuppressionList() {
       </div>
 
       {/* Warning banner */}
-      <Card className="border-amber-200 bg-amber-50/40 dark:border-amber-900 dark:bg-amber-950/10">
+      <Card className="border-red-200 bg-red-50/50 dark:border-red-900 dark:bg-red-950/20">
         <CardContent className="p-4 flex items-start gap-3">
-          <AlertCircle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
+          <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
           <div className="text-xs space-y-0.5">
-            <p className="font-semibold text-foreground">Suppressed contacts are permanently excluded from all sends.</p>
-            <p className="text-muted-foreground">Re-adding an unsubscribed contact without their explicit re-consent may violate CAN-SPAM and GDPR. Only restore bounced contacts after verifying the address.</p>
+            <p className="font-semibold text-red-800 dark:text-red-300">Suppressed contacts are permanently excluded from all sends.</p>
+            <p className="text-red-700/80 dark:text-red-400">Re-adding an unsubscribed contact without their explicit re-consent may violate CAN-SPAM and GDPR. Only restore bounced contacts after verifying the address.</p>
           </div>
         </CardContent>
       </Card>

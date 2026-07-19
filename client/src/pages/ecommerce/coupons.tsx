@@ -55,15 +55,15 @@ export default function Coupons() {
       {/* KPIs */}
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         {[
-          { label: 'Active Coupons', value: '4', sub: '2 paused / expired' },
-          { label: 'Total Redemptions', value: '8,691', sub: 'All time' },
-          { label: 'Revenue Attributed', value: '$275,500', sub: 'From coupon orders' },
-          { label: 'Avg Discount', value: '23%', sub: 'Across active coupons' },
-        ].map(({ label, value, sub }) => (
-          <Card key={label} className="border-border/60">
+          { label: 'Active Coupons',      value: '4',        sub: '2 paused / expired',     colored: true,  bg: 'bg-violet-50 dark:bg-violet-950/30', border: 'border-violet-200 dark:border-violet-800', lCls: 'text-violet-600 dark:text-violet-400', vCls: 'text-violet-900 dark:text-violet-200' },
+          { label: 'Total Redemptions',   value: '8,691',    sub: 'All time',               colored: true,  bg: 'bg-blue-50 dark:bg-blue-950/30',    border: 'border-blue-200 dark:border-blue-800',    lCls: 'text-blue-600 dark:text-blue-400',    vCls: 'text-blue-900 dark:text-blue-200'    },
+          { label: 'Revenue Attributed',  value: '$275,500', sub: 'From coupon orders',     colored: true,  bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200 dark:border-emerald-800', lCls: 'text-emerald-600 dark:text-emerald-400', vCls: 'text-emerald-900 dark:text-emerald-200' },
+          { label: 'Avg Discount',        value: '23%',      sub: 'Across active coupons',  colored: false },
+        ].map(({ label, value, sub, colored, bg, border, lCls, vCls }: any) => (
+          <Card key={label} className={`border ${colored ? `${bg} ${border}` : 'border-border/60'}`}>
             <CardContent className="p-5">
-              <p className="text-xs text-muted-foreground mb-2">{label}</p>
-              <p className="text-2xl font-bold">{value}</p>
+              <p className={`text-xs font-medium mb-2 ${colored ? lCls : 'text-muted-foreground'}`}>{label}</p>
+              <p className={`text-2xl font-bold ${colored ? vCls : ''}`}>{value}</p>
               <p className="text-xs text-muted-foreground mt-1">{sub}</p>
             </CardContent>
           </Card>

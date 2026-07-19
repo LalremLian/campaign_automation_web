@@ -62,18 +62,18 @@ export default function Catalog() {
       {/* Stats */}
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         {[
-          { label: 'Total Products', value: '248', sub: '8 shown', icon: Package },
-          { label: 'Total Revenue', value: '$1.08M', sub: '+12.4% vs prev', icon: TrendingUp },
-          { label: 'Best Seller', value: 'WNC-001', sub: '1,840 units sold', icon: Star },
-          { label: 'Out of Stock', value: '2', sub: 'Needs restocking', icon: ArrowUpRight },
-        ].map(({ label, value, sub, icon: Icon }) => (
-          <Card key={label} className="border-border/60">
+          { label: 'Total Products', value: '248',    sub: '8 shown',            icon: Package,    bg: 'bg-blue-50 dark:bg-blue-950/30',    border: 'border-blue-200 dark:border-blue-800',    iconBg: 'bg-blue-100 dark:bg-blue-900',    iconCls: 'text-blue-600 dark:text-blue-400',    lCls: 'text-blue-600 dark:text-blue-400',    vCls: 'text-blue-900 dark:text-blue-200'    },
+          { label: 'Total Revenue',  value: '$1.08M', sub: '+12.4% vs prev',     icon: TrendingUp, bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200 dark:border-emerald-800', iconBg: 'bg-emerald-100 dark:bg-emerald-900', iconCls: 'text-emerald-600 dark:text-emerald-400', lCls: 'text-emerald-600 dark:text-emerald-400', vCls: 'text-emerald-900 dark:text-emerald-200' },
+          { label: 'Best Seller',    value: 'WNC-001',sub: '1,840 units sold',   icon: Star,       bg: 'bg-amber-50 dark:bg-amber-950/30',   border: 'border-amber-200 dark:border-amber-800',   iconBg: 'bg-amber-100 dark:bg-amber-900',   iconCls: 'text-amber-600 dark:text-amber-400',   lCls: 'text-amber-600 dark:text-amber-400',   vCls: 'text-amber-900 dark:text-amber-200'   },
+          { label: 'Out of Stock',   value: '2',      sub: 'Needs restocking',   icon: ArrowUpRight, bg: 'bg-rose-50 dark:bg-rose-950/30',  border: 'border-rose-200 dark:border-rose-800',    iconBg: 'bg-rose-100 dark:bg-rose-900',    iconCls: 'text-rose-600 dark:text-rose-400',    lCls: 'text-rose-600 dark:text-rose-400',    vCls: 'text-rose-900 dark:text-rose-200'    },
+        ].map(({ label, value, sub, icon: Icon, bg, border, iconBg, iconCls, lCls, vCls }) => (
+          <Card key={label} className={`border ${bg} ${border}`}>
             <CardContent className="p-5">
               <div className="flex items-start justify-between mb-3">
-                <p className="text-xs text-muted-foreground">{label}</p>
-                <div className="w-7 h-7 rounded-md bg-secondary flex items-center justify-center"><Icon className="w-3.5 h-3.5 text-foreground" /></div>
+                <p className={`text-xs font-medium ${lCls}`}>{label}</p>
+                <div className={`w-7 h-7 rounded-md flex items-center justify-center ${iconBg}`}><Icon className={`w-3.5 h-3.5 ${iconCls}`} /></div>
               </div>
-              <p className="text-2xl font-bold">{value}</p>
+              <p className={`text-2xl font-bold ${vCls}`}>{value}</p>
               <p className="text-xs text-muted-foreground mt-1">{sub}</p>
             </CardContent>
           </Card>

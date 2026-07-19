@@ -32,7 +32,7 @@ export default function Templates() {
           <p className="text-muted-foreground mt-1">Design and manage reusable email templates.</p>
         </div>
         <div className="flex gap-2">
-          <div className="relative w-64 hidden md:block">
+          <div className="relative w-[360px] hidden md:block">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search templates..."

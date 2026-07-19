@@ -203,14 +203,33 @@
   position: fixed;
   top: 0;
   left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .app-shell-inner {
-  /* width and height set inline by Shell JS, zoom applied by JS */
+  /* width/height/zoom controlled by Shell JS */
   transform-origin: top left;
+  width: 100%;
+  height: 100dvh;
 }
 
 .app-desktop-root {
   min-width: 1280px;
   overflow-x: auto;
+}
+
+/* Thin overlay scrollbar inside app shell — doesn't eat into layout width */
+.app-shell-inner main::-webkit-scrollbar {
+  width: 6px;
+}
+.app-shell-inner main::-webkit-scrollbar-track {
+  background: transparent;
+}
+.app-shell-inner main::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 999px;
+}
+.app-shell-inner main::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
 }
